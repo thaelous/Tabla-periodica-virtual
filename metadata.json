@@ -1,0 +1,6 @@
+{
+  "name": "Tabla Periódica Interactiva",
+  "description": "Tabla periódica interactiva con inspector cuántico de orbitales, calculadora de masa molar, balanceador de ecuaciones, laboratorio virtual y constructor de moléculas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,3910 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#090d16',
+              card: '#111827',
+              surface: '#1e293b',
+              border: '#1f2937',
+              cyan: '#38bdf8'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabla Periódica Interactiva - por Robert Pacheco</title>
+  <meta name="description" content="Plataforma educativa moderna: Tabla periódica interactiva, simulador cuántico vs Bohr, constructor universal de moléculas con física 3D y laboratorio virtual químico interactivo.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #090d16;
+      --bg-card: #111827;
+      --bg-subtle: #1e293b;
+      --border-soft: #1f2937;
+      --border-focus: #38bdf8;
+      --text-main: #ffffff;
+      --text-muted: #9ca3af;
+      --text-dim: #64748b;
+      --primary: #38bdf8;
+      --primary-hover: #0ea5e9;
+      --primary-light: rgba(56, 189, 248, 0.15);
+      --accent: #818cf8;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+
+      /* Categorías para Modo Oscuro: saturación y luminancia de alto contraste */
+      --cat-nonmetal-bg: rgba(34, 197, 94, 0.18); --cat-nonmetal-border: rgba(74, 222, 128, 0.4); --cat-nonmetal-text: #86efac;
+      --cat-noble-bg: rgba(168, 85, 247, 0.18); --cat-noble-border: rgba(192, 132, 252, 0.4); --cat-noble-text: #d8b4fe;
+      --cat-alkali-bg: rgba(239, 68, 68, 0.18); --cat-alkali-border: rgba(248, 113, 113, 0.4); --cat-alkali-text: #fca5a5;
+      --cat-alkaline-bg: rgba(249, 115, 22, 0.18); --cat-alkaline-border: rgba(251, 146, 60, 0.4); --cat-alkaline-text: #fdba74;
+      --cat-metalloid-bg: rgba(234, 179, 8, 0.18); --cat-metalloid-border: rgba(250, 204, 21, 0.4); --cat-metalloid-text: #fde047;
+      --cat-halogen-bg: rgba(6, 182, 212, 0.18); --cat-halogen-border: rgba(34, 211, 238, 0.4); --cat-halogen-text: #67e8f9;
+      --cat-transition-bg: rgba(99, 102, 241, 0.18); --cat-transition-border: rgba(129, 140, 248, 0.4); --cat-transition-text: #a5b4fc;
+      --cat-post-trans-bg: rgba(148, 163, 184, 0.18); --cat-post-trans-border: rgba(203, 213, 225, 0.4); --cat-post-trans-text: #cbd5e1;
+      --cat-lanthanide-bg: rgba(236, 72, 153, 0.18); --cat-lanthanide-border: rgba(244, 114, 182, 0.4); --cat-lanthanide-text: #f472b6;
+      --cat-actinide-bg: rgba(139, 92, 246, 0.18); --cat-actinide-border: rgba(167, 139, 250, 0.4); --cat-actinide-text: #c4b5fd;
+
+      --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.5), 0 0 15px rgba(56, 189, 248, 0.05);
+      --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.85), 0 0 30px rgba(56, 189, 248, 0.1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(15, 23, 42, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid #1f2937 !important;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+    }
+
+    .brand-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .nav-tabs {
+      display: flex;
+      background: var(--bg-subtle);
+      padding: 4px;
+      border-radius: 12px;
+      gap: 4px;
+      border: 1px solid var(--border-soft);
+    }
+
+    .nav-tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .nav-tab:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .nav-tab.active {
+      background: var(--bg-card);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    main {
+      flex: 1;
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(14, 165, 233, 0.25);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: var(--bg-card);
+      border-color: var(--border-soft);
+      color: var(--text-main);
+    }
+
+    .btn-outline:hover {
+      background: var(--bg-subtle);
+      border-color: var(--border-focus);
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #b91c1c;
+    }
+
+    .btn-danger:hover {
+      background: #fecaca;
+    }
+
+    /* Buscador y Filtros */
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 280px;
+      max-width: 460px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 16px 10px 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card);
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .search-input:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+
+    /* Leyenda */
+    .legend-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+      background: var(--bg-card);
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border-soft);
+    }
+
+    .legend-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 1px solid transparent;
+      user-select: none;
+    }
+
+    .legend-chip:hover {
+      transform: translateY(-1px);
+    }
+
+    .legend-chip.active {
+      box-shadow: 0 0 0 2px var(--text-main);
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    /* Tabla Periódica Rejilla */
+    .periodic-table-wrapper {
+      overflow-x: auto;
+      background: var(--bg-card);
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .periodic-grid {
+      display: grid;
+      grid-template-columns: repeat(18, minmax(62px, 1fr));
+      grid-template-rows: repeat(10, minmax(68px, auto));
+      gap: 6px;
+      min-width: 1140px;
+    }
+
+    .element-card {
+      position: relative;
+      border-radius: 8px;
+      padding: 4px 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid transparent;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+
+    .element-card:hover {
+      transform: translateY(-3px) scale(1.04);
+      z-index: 10;
+      box-shadow: var(--shadow-md);
+    }
+
+    .element-card.dimmed {
+      opacity: 0.2;
+      filter: grayscale(80%);
+    }
+
+    .element-card .el-z {
+      font-size: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      opacity: 0.75;
+    }
+
+    .element-card .el-symbol {
+      font-size: 1.25rem;
+      font-weight: 800;
+      line-height: 1;
+      text-align: center;
+      margin: 2px 0;
+      letter-spacing: -0.02em;
+    }
+
+    .element-card .el-name {
+      font-size: 0.65rem;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 500;
+    }
+
+    .element-card .el-mass {
+      font-size: 0.55rem;
+      font-family: 'JetBrains Mono', monospace;
+      text-align: center;
+      opacity: 0.7;
+    }
+
+    .cat-nonmetal { background: var(--cat-nonmetal-bg); border-color: var(--cat-nonmetal-border); color: var(--cat-nonmetal-text); }
+    .cat-noble { background: var(--cat-noble-bg); border-color: var(--cat-noble-border); color: var(--cat-noble-text); }
+    .cat-alkali { background: var(--cat-alkali-bg); border-color: var(--cat-alkali-border); color: var(--cat-alkali-text); }
+    .cat-alkaline { background: var(--cat-alkaline-bg); border-color: var(--cat-alkaline-border); color: var(--cat-alkaline-text); }
+    .cat-metalloid { background: var(--cat-metalloid-bg); border-color: var(--cat-metalloid-border); color: var(--cat-metalloid-text); }
+    .cat-halogen { background: var(--cat-halogen-bg); border-color: var(--cat-halogen-border); color: var(--cat-halogen-text); }
+    .cat-transition { background: var(--cat-transition-bg); border-color: var(--cat-transition-border); color: var(--cat-transition-text); }
+    .cat-post-trans { background: var(--cat-post-trans-bg); border-color: var(--cat-post-trans-border); color: var(--cat-post-trans-text); }
+    .cat-lanthanide { background: var(--cat-lanthanide-bg); border-color: var(--cat-lanthanide-border); color: var(--cat-lanthanide-text); }
+    .cat-actinide { background: var(--cat-actinide-bg); border-color: var(--cat-actinide-border); color: var(--cat-actinide-text); }
+
+    .placeholder-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed var(--border-soft);
+      border-radius: 8px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      background: var(--bg-subtle);
+    }
+
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(14, 165, 233, 0.35);
+      transform: scale(0);
+      animation: rippleEffect 0.6s linear;
+      pointer-events: none;
+    }
+
+    @keyframes rippleEffect {
+      to { transform: scale(4); opacity: 0; }
+    }
+
+    /* Modal Inspector Cuántico */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal-dialog {
+      background: var(--bg-card);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 920px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-modal);
+      border: 1px solid var(--border-soft);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(15, 23, 42, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid #1f2937 !important;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: var(--bg-card);
+      z-index: 10;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border-soft);
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--text-muted);
+      transition: all 0.15s;
+    }
+
+    .modal-close:hover {
+      background: var(--bg-subtle);
+      color: var(--text-main);
+    }
+
+    .modal-body {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .modal-body { grid-template-columns: 1fr; }
+    }
+
+    .model-switcher-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      background: var(--bg-subtle);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
+    }
+
+    .model-switch-btn {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .model-switch-btn.active {
+      background: var(--bg-card);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .atom-canvas-wrapper {
+      position: relative;
+      background: #090d16;
+      border-radius: 16px;
+      overflow: hidden;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    #atomSimulationCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .atom-info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .info-tile {
+      background: var(--bg-subtle);
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
+    }
+
+    .info-tile-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .info-tile-val {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-top: 2px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* CONSTRUCTOR UNIVERSAL DE MOLÉCULAS */
+    .builder-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr 340px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 1200px) {
+      .builder-layout { grid-template-columns: 1fr; }
+    }
+
+    .element-palette {
+      max-height: 580px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 6px;
+    }
+
+    .palette-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .palette-item:hover {
+      border-color: var(--border-focus);
+      transform: translateX(3px);
+      background: var(--bg-subtle);
+    }
+
+    .workbench-container {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .workbench-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-soft);
+      background: var(--bg-card);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    #workbenchCanvas {
+      width: 100%;
+      height: 480px;
+      background: radial-gradient(circle at center, #0f172a 0%, #090d16 100%) !important;
+      display: block;
+      cursor: grab;
+    }
+
+    #workbenchCanvas:active { cursor: grabbing; }
+
+    /* LABORATORIO VIRTUAL REESCRITO */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr 360px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 1200px) {
+      .lab-layout { grid-template-columns: 1fr; }
+    }
+
+    .reagent-rack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .reagent-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-main);
+      text-align: left;
+    }
+
+    .reagent-btn:hover {
+      border-color: var(--border-focus);
+      background: var(--primary-light);
+      transform: translateX(3px);
+    }
+
+    .reagent-btn.btn-callout {
+      animation: calloutPulse 1.5s infinite;
+      border-color: var(--primary);
+    }
+
+    .reagent-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.82rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .lab-stage {
+      position: relative;
+      background: var(--bg-card);
+      border-radius: 16px;
+      border: 1px solid var(--border-soft);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+    }
+
+    #labCanvas {
+      width: 100%;
+      height: 480px;
+      background: radial-gradient(circle at center, #0f172a 0%, #090d16 100%) !important;
+      display: block;
+    }
+
+    .lab-controls-bar {
+      padding: 16px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .temp-control-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stirrer-control-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .telemetry-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--bg-subtle);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+    }
+
+    .telemetry-label {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .telemetry-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .ph-gradient-bar {
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(to right, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899);
+      position: relative;
+      margin: 8px 0;
+    }
+
+    .ph-indicator-pin {
+      position: absolute;
+      top: -4px;
+      width: 4px;
+      height: 16px;
+      background: #0f172a;
+      border-radius: 2px;
+      transform: translateX(-50%);
+      transition: left 0.3s ease;
+    }
+
+    .log-box {
+      max-height: 280px;
+      overflow-y: auto;
+      font-size: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px;
+      background: var(--bg-subtle);
+      border-radius: 8px;
+      border: 1px solid var(--border-soft);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .log-entry {
+      padding: 6px 8px;
+      border-radius: 6px;
+      background: var(--bg-card);
+      border-left: 3px solid var(--primary);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    /* HERRAMIENTAS & CALCULADORAS */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .tools-grid { grid-template-columns: 1fr; }
+    }
+
+    /* QUIZ */
+    .quiz-container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .quiz-option {
+      width: 100%;
+      text-align: left;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card);
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: all 0.15s;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .quiz-option:hover {
+      border-color: var(--border-focus);
+      background: var(--bg-subtle);
+    }
+
+    .quiz-option.correct {
+      background: #dcfce7;
+      border-color: #22c55e;
+      color: #15803d;
+    }
+
+    .quiz-option.incorrect {
+      background: #fee2e2;
+      border-color: #ef4444;
+      color: #991b1b;
+    }
+  
+    @keyframes tutorPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7); transform: scale(1); }
+      50% { box-shadow: 0 0 0 8px rgba(56, 189, 248, 0); transform: scale(1.03); }
+    }
+    .btn-callout {
+      animation: tutorPulse 1.8s infinite ease-in-out !important;
+      border-color: var(--primary) !important;
+      background: rgba(56, 189, 248, 0.2) !important;
+      color: #38bdf8 !important;
+    }
+    .card {
+      background-color: var(--bg-card) !important;
+      border: 1px solid var(--border-soft) !important;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4) !important;
+    }
+    .palette-item {
+      background: #1e293b !important;
+      border: 1px solid var(--border-soft) !important;
+      color: var(--text-main) !important;
+    }
+    .palette-item:hover {
+      background: #334155 !important;
+      border-color: var(--primary) !important;
+    }
+    .reagent-btn {
+      background: #1e293b !important;
+      color: var(--text-main) !important;
+      border: 1px solid var(--border-soft) !important;
+    }
+    .reagent-btn:hover {
+      background: #334155 !important;
+      border-color: var(--primary) !important;
+    }
+    .form-input {
+      background: #0f172a !important;
+      color: var(--text-main) !important;
+      border: 1px solid var(--border-soft) !important;
+    }
+    .form-input:focus {
+      border-color: var(--primary) !important;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25) !important;
+    }
+    .preset-pill {
+      background: #1e293b !important;
+      color: var(--text-main) !important;
+      border: 1px solid var(--border-soft) !important;
+    }
+    .preset-pill:hover {
+      background: #334155 !important;
+      border-color: var(--primary) !important;
+    }
+    .log-entry {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+      color: #94a3b8 !important;
+    }
+    .btn-outline {
+      background: transparent !important;
+      color: var(--text-main) !important;
+      border: 1px solid var(--border-soft) !important;
+    }
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.06) !important;
+      border-color: var(--border-focus) !important;
+    }
+    .placeholder-card {
+      background: rgba(255, 255, 255, 0.03) !important;
+      border: 1px dashed rgba(255, 255, 255, 0.12) !important;
+      color: var(--text-dim) !important;
+    }
+    .nav-tab {
+      color: var(--text-muted) !important;
+    }
+    .nav-tab:hover {
+      color: var(--text-main) !important;
+      background: rgba(255, 255, 255, 0.04) !important;
+    }
+    .nav-tab.active {
+      color: var(--primary) !important;
+      background: rgba(56, 189, 248, 0.12) !important;
+    }
+    .quiz-option {
+      background: #1e293b !important;
+      border: 1px solid var(--border-soft) !important;
+      color: var(--text-main) !important;
+    }
+    .quiz-option:hover {
+      background: #334155 !important;
+      border-color: var(--primary) !important;
+    }
+    .quiz-option.correct {
+      background: rgba(34, 197, 94, 0.2) !important;
+      border-color: #22c55e !important;
+      color: #86efac !important;
+    }
+    .quiz-option.incorrect {
+      background: rgba(239, 68, 68, 0.2) !important;
+      border-color: #ef4444 !important;
+      color: #fca5a5 !important;
+    }
+
+  
+    /* Micro-átomo cuántico animado para las tarjetas de elementos */
+    .mini-atom-wrap {
+      position: relative;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mini-atom-core {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 8px var(--primary);
+      z-index: 2;
+    }
+    .mini-orbit-ring {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 28px;
+      height: 28px;
+      border: 1px dashed rgba(56, 189, 248, 0.4);
+      border-radius: 50%;
+      animation: spinOrbit 3s linear infinite;
+    }
+    .mini-orbit-ring:nth-child(2) {
+      width: 22px;
+      height: 22px;
+      top: 3px;
+      left: 3px;
+      border: 1px dotted rgba(129, 140, 248, 0.5);
+      animation: spinOrbitRev 2s linear infinite;
+      transform: rotate(45deg);
+    }
+    .mini-orbit-electron {
+      position: absolute;
+      top: -2px;
+      left: 12px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #38bdf8;
+      box-shadow: 0 0 4px #38bdf8;
+    }
+    @keyframes spinOrbit {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes spinOrbitRev {
+      from { transform: rotate(45deg) rotate(0deg); }
+      to { transform: rotate(45deg) rotate(-360deg); }
+    }
+
+    /* Modal cuántico en modo oscuro inmersivo */
+    .modal-content {
+      background: #0f172a !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      color: var(--text-main) !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8) !important;
+    }
+    .modal-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(15, 23, 42, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid #1f2937 !important;
+    }
+    .modal-close-btn {
+      background: rgba(255, 255, 255, 0.05) !important;
+      color: var(--text-muted) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    .modal-close-btn:hover {
+      background: rgba(255, 255, 255, 0.15) !important;
+      color: #ffffff !important;
+    }
+
+    /* Bitácora de laboratorio y cajas de datos en modo oscuro */
+    .lab-terminal {
+      background: #090d16 !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    .info-card-subtle {
+      background: #151d2f !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+  
+    input, select, textarea {
+      background-color: #0f172a !important;
+      color: #f8fafc !important;
+      border-color: #1f2937 !important;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #38bdf8 !important;
+      outline: none !important;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2) !important;
+    }
+    .modal-backdrop {
+      background: rgba(0, 0, 0, 0.75) !important;
+      backdrop-filter: blur(8px) !important;
+    }
+    .modal-container, .modal-content {
+      background: #0f172a !important;
+      border: 1px solid #1f2937 !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 25px rgba(56, 189, 248, 0.1) !important;
+    }
+
+  
+    /* ========================================================= */
+    /* DISEÑO 100% RESPONSIVO PARA TELÉFONOS MÓVILES Y TABLETS   */
+    /* ========================================================= */
+
+    .mobile-scroll-hint {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 14px;
+      margin-bottom: 12px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px dashed rgba(56, 189, 248, 0.35);
+      border-radius: 10px;
+      color: #38bdf8;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-align: center;
+      user-select: none;
+    }
+
+    @media (max-width: 1024px) {
+      .mobile-scroll-hint {
+        display: flex;
+      }
+    }
+
+    /* Pestañas con scroll horizontal táctil suave */
+    .nav-tabs {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      max-width: 100%;
+    }
+    .nav-tabs::-webkit-scrollbar {
+      display: none;
+    }
+    .nav-tab {
+      flex-shrink: 0;
+      white-space: nowrap;
+      min-height: 42px;
+    }
+
+    /* Contenedor de la tabla periódica con scroll horizontal fluido */
+    .periodic-table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: #38bdf8 #111827;
+    }
+    .periodic-table-wrapper::-webkit-scrollbar {
+      height: 8px;
+    }
+    .periodic-table-wrapper::-webkit-scrollbar-track {
+      background: #111827;
+      border-radius: 4px;
+    }
+    .periodic-table-wrapper::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    /* Reorganización responsive para móviles y tablets */
+    @media (max-width: 1024px) {
+      main {
+        padding: 14px 10px !important;
+      }
+      .header-container {
+        padding: 10px 14px !important;
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 12px !important;
+      }
+      .brand {
+        justify-content: flex-start;
+      }
+      .brand-title {
+        font-size: 1.15rem !important;
+      }
+      .brand-subtitle {
+        font-size: 0.75rem !important;
+        color: #38bdf8 !important;
+        font-weight: 600 !important;
+      }
+
+      /* Barra de navegación MULTILÍNEA / CUADRÍCULA FLEXIBLE (100% visible sin scroll) */
+      .nav-tabs {
+        width: 100% !important;
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 6px !important;
+        padding: 6px !important;
+        overflow-x: visible !important;
+        background: rgba(15, 23, 42, 0.95) !important;
+      }
+      .nav-tab {
+        width: 100% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        padding: 9px 8px !important;
+        font-size: 0.8rem !important;
+        min-height: 44px !important;
+        white-space: normal !important;
+        border-radius: 8px !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      }
+      .nav-tab.active {
+        background: #1e293b !important;
+        color: #38bdf8 !important;
+        border-color: rgba(56, 189, 248, 0.4) !important;
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.15) !important;
+      }
+      /* La quinta pestaña 'Quiz & Desafío' abarca las 2 columnas para una distribución perfecta (2 + 2 + 1) */
+      .nav-tab:last-child {
+        grid-column: span 2 !important;
+      }
+
+      /* CONSTRUCTOR DE MOLÉCULAS: PRIORIDAD VISUAL TOTAL AL LIENZO 3D (CANVAS PRIMERO EN MÓVIL) */
+      .builder-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+      }
+      #builderWorkbenchContainer, .workbench-container {
+        order: 1 !important; /* ¡LIENZO INTERACTIVO CON ANIMACIÓN 3D Y CANVAS PRIMERO! */
+      }
+      #builderPaletteCard, .builder-palette-card {
+        order: 2 !important; /* Banco de 118 elementos inmediatamente después */
+      }
+      #builderFeasibilityCard, .builder-feasibility-card {
+        order: 3 !important; /* Panel de factibilidad química al final */
+      }
+      .element-palette {
+        max-height: 250px !important;
+      }
+      #workbenchCanvas {
+        height: 360px !important;
+      }
+
+      /* Laboratorio virtual en columna única */
+      .lab-layout {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+      }
+      #labCanvas {
+        height: 350px !important;
+      }
+      .reagent-rack {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+        gap: 8px !important;
+      }
+      .reagent-btn {
+        min-height: 46px !important;
+        padding: 8px 10px !important;
+      }
+      .lab-controls-bar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+      }
+      .temp-control-group, .stirrer-control-group {
+        justify-content: space-between !important;
+        width: 100% !important;
+      }
+
+      /* Controles de la tabla periódica */
+      .controls-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .search-box {
+        max-width: 100% !important;
+        width: 100%;
+      }
+
+      /* Herramientas químicas y Quiz */
+      .tools-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* Modal Inspector Cuántico */
+      .modal-dialog {
+        width: 96% !important;
+        margin: 10px auto !important;
+        max-height: 94vh !important;
+      }
+      .modal-body {
+        padding: 14px !important;
+        gap: 14px !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .brand-title {
+        font-size: 1.05rem !important;
+      }
+      .nav-tabs {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 5px !important;
+        padding: 5px !important;
+      }
+      .nav-tab {
+        padding: 8px 6px !important;
+        font-size: 0.75rem !important;
+        min-height: 42px !important;
+        gap: 4px !important;
+      }
+      .nav-tab span {
+        font-size: 0.9rem !important;
+      }
+      .card {
+        padding: 14px !important;
+        border-radius: 12px !important;
+      }
+      #workbenchCanvas {
+        height: 330px !important;
+      }
+    }
+
+  
+    /* ========================================================= */
+    /* BOTÓN HAMBURGUESA Y PANEL DESPLEGABLE FLOTANTE EN MÓVIL    */
+    /* ========================================================= */
+
+    .mobile-menu-btn {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background: #1e293b;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 10px;
+      padding: 8px 12px;
+      color: #38bdf8;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .mobile-menu-btn:active {
+      transform: scale(0.96);
+      background: #334155;
+    }
+
+    .hamburger-bar-icon {
+      font-size: 1.15rem;
+      line-height: 1;
+    }
+
+    .mobile-menu-chevron {
+      font-size: 0.75rem;
+      transition: transform 0.2s;
+    }
+
+    .mobile-menu-drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+      display: none;
+    }
+
+    .mobile-menu-drawer.active {
+      display: block;
+    }
+
+    .mobile-menu-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(9, 13, 22, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      animation: fadeInBackdrop 0.2s ease;
+    }
+
+    .mobile-menu-content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #0f172a;
+      border-bottom: 1px solid #1f2937;
+      border-radius: 0 0 20px 20px;
+      padding: 16px 14px 20px;
+      max-width: 520px;
+      margin: 0 auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.95), 0 0 30px rgba(56, 189, 248, 0.15);
+      animation: slideDownDrawer 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      z-index: 2;
+    }
+
+    @keyframes slideDownDrawer {
+      from { transform: translateY(-30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes fadeInBackdrop {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .mobile-menu-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #1f2937;
+      margin-bottom: 12px;
+    }
+
+    .mobile-menu-close-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .mobile-menu-close-btn:active {
+      background: #334155;
+      color: #ffffff;
+    }
+
+    .mobile-menu-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mobile-nav-card {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 12px;
+      color: #ffffff;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+    }
+
+    .mobile-nav-card:hover, .mobile-nav-card:active {
+      background: #1e293b;
+      border-color: rgba(56, 189, 248, 0.4);
+      transform: scale(0.99);
+    }
+
+    .mobile-nav-card.active {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: #38bdf8;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.15);
+    }
+
+    .mobile-nav-card.active .nav-card-title {
+      color: #38bdf8;
+    }
+
+    .nav-card-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1e293b;
+      border-radius: 8px;
+    }
+
+    .nav-card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .nav-card-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .nav-card-desc {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      line-height: 1.3;
+    }
+
+    .nav-card-arrow {
+      color: #64748b;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .mobile-nav-card.active .nav-card-arrow {
+      color: #38bdf8;
+    }
+
+    /* Reglas en pantallas móviles */
+    @media (max-width: 1024px) {
+      .mobile-menu-btn {
+        display: inline-flex !important;
+      }
+      .desktop-nav-tabs {
+        display: none !important;
+      }
+      .header-container {
+        padding: 10px 16px !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+      }
+
+      /* PRIORIDAD ABSOLUTA AL CANVAS EN EL CONSTRUCTOR */
+      .builder-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 14px !important;
+      }
+      #builderWorkbenchContainer, .workbench-container {
+        order: 1 !important; /* ¡LIENZO GRÁFICO 3D Y CANVAS PRIMERO EN LA PANTALLA! */
+        margin-top: 0 !important;
+      }
+      #builderPaletteCard, .builder-palette-card {
+        order: 2 !important; /* Selector de átomos después */
+      }
+      #builderFeasibilityCard, .builder-feasibility-card {
+        order: 3 !important; /* Factibilidad química */
+      }
+      #workbenchCanvas {
+        height: 360px !important;
+      }
+    }
+
+  </style>
+</head>
+<body class="bg-[#090d16] text-slate-100 min-h-screen antialiased selection:bg-sky-500 selection:text-white" style="background-color: #090d16 !important; color: #f8fafc !important;">
+
+  <!-- HEADER CON MARCA Y NAVEGACIÓN -->
+  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon">⚛️</div>
+        <div>
+          <h1 class="brand-title">Tabla Periódica Interactiva</h1>
+          <p class="brand-subtitle">por Robert Pacheco</p>
+        </div>
+      </div>
+
+      <!-- BOTÓN MENÚ HAMBURGUESA MODERNO PARA MÓVILES -->
+      <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()" aria-label="Abrir Menú de Módulos" aria-expanded="false">
+        <span class="hamburger-bar-icon">☰</span>
+        <span class="mobile-menu-label">Módulos</span>
+        <span class="mobile-menu-chevron">▾</span>
+      </button>
+
+      <!-- BARRA DE PESTAÑAS HORIZONTAL PARA ESCRITORIO -->
+      <nav class="nav-tabs desktop-nav-tabs">
+        <button class="nav-tab active" data-tab="tab-periodic" onclick="switchTab('tab-periodic')">
+          <span>🏛️</span> Tabla Periódica
+        </button>
+        <button class="nav-tab" data-tab="tab-builder" onclick="switchTab('tab-builder')">
+          <span>🧪</span> Constructor de Moléculas
+        </button>
+        <button class="nav-tab" data-tab="tab-lab" onclick="switchTab('tab-lab')">
+          <span>🔬</span> Laboratorio Virtual
+        </button>
+        <button class="nav-tab" data-tab="tab-tools" onclick="switchTab('tab-tools')">
+          <span>⚖️</span> Herramientas & Cálculos
+        </button>
+        <button class="nav-tab" data-tab="tab-quiz" onclick="switchTab('tab-quiz')">
+          <span>🎯</span> Quiz & Desafío
+        </button>
+      </nav>
+    </div>
+
+    <!-- PANEL FLOTANTE / DRAWER DESPLEGABLE EN MÓVIL CON ANIMACIÓN SUAVE -->
+    <div class="mobile-menu-drawer" id="mobileMenuDrawer">
+      <div class="mobile-menu-backdrop" onclick="toggleMobileMenu()"></div>
+      <div class="mobile-menu-content">
+        <div class="mobile-menu-top-bar">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="brand-icon" style="width: 32px; height: 32px; font-size: 16px;">⚛️</div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.95rem; color: #ffffff;">Módulos Interactivos</div>
+              <div style="font-size: 0.72rem; color: #38bdf8;">Selecciona una sección educativa</div>
+            </div>
+          </div>
+          <button class="mobile-menu-close-btn" onclick="toggleMobileMenu()" aria-label="Cerrar Menú">✕</button>
+        </div>
+
+        <div class="mobile-menu-list">
+          <button class="mobile-nav-card active" data-tab="tab-periodic" onclick="handleMobileNav('tab-periodic')">
+            <span class="nav-card-icon">🏛️</span>
+            <div class="nav-card-body">
+              <span class="nav-card-title">Tabla Periódica IUPAC</span>
+              <span class="nav-card-desc">118 elementos, ondas acuáticas y selector cuántico |Ψ|² vs Bohr</span>
+            </div>
+            <span class="nav-card-arrow">➔</span>
+          </button>
+
+          <button class="mobile-nav-card" data-tab="tab-builder" onclick="handleMobileNav('tab-builder')">
+            <span class="nav-card-icon">🧪</span>
+            <div class="nav-card-body">
+              <span class="nav-card-title">Constructor de Moléculas</span>
+              <span class="nav-card-desc">Lienzo 3D prioritario, átomos animados, factibilidad y ΔEN</span>
+            </div>
+            <span class="nav-card-arrow">➔</span>
+          </button>
+
+          <button class="mobile-nav-card" data-tab="tab-lab" onclick="handleMobileNav('tab-lab')">
+            <span class="nav-card-icon">🔬</span>
+            <div class="nav-card-body">
+              <span class="nav-card-title">Laboratorio Virtual</span>
+              <span class="nav-card-desc">Vaso con menisco, mechero Bunsen, agitador y Tutor Activo</span>
+            </div>
+            <span class="nav-card-arrow">➔</span>
+          </button>
+
+          <button class="mobile-nav-card" data-tab="tab-tools" onclick="handleMobileNav('tab-tools')">
+            <span class="nav-card-icon">⚖️</span>
+            <div class="nav-card-body">
+              <span class="nav-card-title">Herramientas & Cálculos</span>
+              <span class="nav-card-desc">Masa molar porcentual y balanceador de ecuaciones de 1 clic</span>
+            </div>
+            <span class="nav-card-arrow">➔</span>
+          </button>
+
+          <button class="mobile-nav-card" data-tab="tab-quiz" onclick="handleMobileNav('tab-quiz')">
+            <span class="nav-card-icon">🎯</span>
+            <div class="nav-card-body">
+              <span class="nav-card-title">Quiz & Desafío</span>
+              <span class="nav-card-desc">Evaluación interactiva y racha de conocimiento</span>
+            </div>
+            <span class="nav-card-arrow">➔</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1. TABLA PERIÓDICA -->
+    <section id="tab-periodic" class="tab-content active">
+      <div class="controls-bar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" class="search-input" placeholder="Buscar por elemento, símbolo o número atómico (ej: Oro, Au, 79)..." oninput="handleSearch(this.value)">
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button class="btn btn-outline" onclick="resetFilters()">🔄 Restablecer Filtros</button>
+        </div>
+      </div>
+
+      <!-- Leyenda de Categorías Pastel -->
+      <div class="legend-grid" id="legendContainer">
+        <!-- Renderizado dinámicamente -->
+      </div>
+
+      <!-- Cuadrícula 18 Columnas -->
+      
+      <!-- Pista táctil para teléfonos celulares -->
+      <div class="mobile-scroll-hint">
+        <span>👉</span> Desliza horizontalmente la tabla para explorar los 118 elementos <span>👈</span>
+      </div>
+      <div class="periodic-table-wrapper">
+        <div class="periodic-grid" id="periodicTableGrid">
+          <!-- 118 elementos inyectados dinámicamente -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. CONSTRUCTOR UNIVERSAL DE MOLÉCULAS -->
+    <section id="tab-builder" class="tab-content">
+      <div class="builder-layout">
+        <!-- Catálogo Universal de los 118 Elementos -->
+        <div class="card builder-palette-card" id="builderPaletteCard">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <h2 style="font-size: 1.1rem; font-weight: 700;">Banco de Elementos (1-118)</h2>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Haz clic para agregar</span>
+          </div>
+          <div style="margin-bottom: 10px;">
+            <input type="text" class="search-input" placeholder="Filtrar elemento o símbolo..." oninput="filterPalette(this.value)" style="padding: 8px 12px; font-size: 0.8rem;">
+          </div>
+          <div class="element-palette" id="universalPalette">
+            <!-- Paleta de 118 elementos -->
+          </div>
+        </div>
+
+        <!-- Mesa de Trabajo Canvas -->
+        <div class="workbench-container" id="builderWorkbenchContainer">
+          <div class="workbench-toolbar">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-weight: 700; font-size: 0.95rem;">Lienzo Molecular 3D</span>
+              <span id="atomCounter" style="font-size: 0.75rem; background: var(--bg-subtle); padding: 2px 8px; border-radius: 12px; border: 1px solid var(--border-soft);">0 átomos</span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <button id="btnToggle3D" class="btn btn-primary" onclick="toggle3DAnimation()">
+                <span>🌐</span> Animar en 3D
+              </button>
+              <button class="btn btn-outline" onclick="clearWorkbench()">
+                <span>🗑️</span> Limpiar
+              </button>
+            </div>
+          </div>
+
+          <canvas id="workbenchCanvas"></canvas>
+
+          <!-- Presets rápidos -->
+          <div style="padding: 10px 16px; background: var(--bg-card); border-top: 1px solid var(--border-soft); display: flex; align-items: center; gap: 8px; overflow-x: auto;">
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); white-space: nowrap;">Cargar Preset:</span>
+            <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem;" onclick="loadPreset('H2O')">H₂O (Agua)</button>
+            <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem;" onclick="loadPreset('CO2')">CO₂ (Dióxido de C.)</button>
+            <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem;" onclick="loadPreset('CH4')">CH₄ (Metano)</button>
+            <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem;" onclick="loadPreset('NaCl')">NaCl (Sal Iónica)</button>
+            <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem;" onclick="loadPreset('NH3')">NH₃ (Amoníaco)</button>
+            <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem;" onclick="loadPreset('HCl')">HCl (Ácido)</button>
+            <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem;" onclick="loadPreset('CaO')">CaO (Cal Viva)</button>
+          </div>
+        </div>
+
+        <!-- Panel de Factibilidad Química en Tiempo Real -->
+        <div class="card builder-feasibility-card" id="builderFeasibilityCard">
+          <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <span>🔬</span> Factibilidad Química
+          </h2>
+          <div id="feasibilityCard">
+            <!-- Renderizado dinámicamente según los átomos en mesa -->
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Agrega elementos al lienzo para evaluar electronegatividad, polaridad y estabilidad química.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. LABORATORIO VIRTUAL REESCRITO -->
+    <section id="tab-lab" class="tab-content">
+      <div class="lab-layout">
+        <!-- Rack de Reactivos Químicos -->
+        <div class="card">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+            <h2 style="font-size: 1.1rem; font-weight: 700;">Rack de Reactivos</h2>
+            <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="resetLab()">
+              🧹 Limpiar Vaso
+            </button>
+          </div>
+          <div class="reagent-rack">
+            <button class="reagent-btn" id="reagent-Na" onclick="addReagent('Na')">
+              <span class="reagent-badge" style="background: #fee2e2; color: #b91c1c;">Na</span>
+              <div>
+                <div>Sodio Metálico (Na)</div>
+                <small style="color: var(--text-muted); font-size: 0.7rem;">Reacción Redox vigorosa</small>
+              </div>
+            </button>
+
+            <button class="reagent-btn" id="reagent-phenol" onclick="addReagent('phenol')">
+              <span class="reagent-badge" style="background: #fce7f3; color: #be185d;">Ind</span>
+              <div>
+                <div>Fenolftaleína (Gotas)</div>
+                <small style="color: var(--text-muted); font-size: 0.7rem;">Indicador de pH (viraje fucsia)</small>
+              </div>
+            </button>
+
+            <button class="reagent-btn" id="reagent-HCl" onclick="addReagent('HCl')">
+              <span class="reagent-badge" style="background: #fef9c3; color: #a16207;">HCl</span>
+              <div>
+                <div>Ácido Clorhídrico (HCl)</div>
+                <small style="color: var(--text-muted); font-size: 0.7rem;">Ácido fuerte (aporta H⁺)</small>
+              </div>
+            </button>
+
+            <button class="reagent-btn" id="reagent-NaOH" onclick="addReagent('NaOH')">
+              <span class="reagent-badge" style="background: #e0f2fe; color: #0369a1;">NaOH</span>
+              <div>
+                <div>Hidróxido de Sodio (NaOH)</div>
+                <small style="color: var(--text-muted); font-size: 0.7rem;">Base fuerte (neutralizante)</small>
+              </div>
+            </button>
+
+            <button class="reagent-btn" id="reagent-PbI2" onclick="addReagent('PbI2')">
+              <span class="reagent-badge" style="background: #fef08a; color: #854d0e;">KI+Pb</span>
+              <div>
+                <div>Lluvia de Oro (KI + Pb²⁺)</div>
+                <small style="color: var(--text-muted); font-size: 0.7rem;">Precipitación de PbI₂ dorada</small>
+              </div>
+            </button>
+
+            <button class="reagent-btn" id="reagent-CuSO4" onclick="addReagent('CuSO4')">
+              <span class="reagent-badge" style="background: #dbeafe; color: #1d4ed8;">CuSO₄</span>
+              <div>
+                <div>Sulfato de Cobre (CuSO₄)</div>
+                <small style="color: var(--text-muted); font-size: 0.7rem;">Disolución azul de Cu²⁺(aq)</small>
+              </div>
+            </button>
+
+            <button class="reagent-btn" id="reagent-NaHCO3" onclick="addReagent('NaHCO3')">
+              <span class="reagent-badge" style="background: var(--bg-subtle); color: #334155;">NaHCO₃</span>
+              <div>
+                <div>Bicarbonato de Sodio</div>
+                <small style="color: var(--text-muted); font-size: 0.7rem;">Efervescencia de gas CO₂</small>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Cristalería y Escenario de Laboratorio -->
+        <div class="lab-stage">
+          <canvas id="labCanvas"></canvas>
+
+          <!-- Barra de Controles Físicos (Mechero y Agitador) -->
+          <div class="lab-controls-bar">
+            <!-- Mechero Bunsen -->
+            <div class="temp-control-group">
+              <span style="font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                <span>🔥</span> Mechero Bunsen:
+              </span>
+              <button id="btnBurner" class="btn btn-outline" onclick="toggleBurner()">
+                OFF
+              </button>
+              <input type="range" id="tempSlider" min="20" max="100" value="20" step="1" oninput="setLabTemperature(this.value)" style="width: 110px; cursor: pointer;">
+              <span id="tempDisplay" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; width: 55px;">20.0 °C</span>
+            </div>
+
+            <!-- Agitador Magnético -->
+            <div class="stirrer-control-group">
+              <span style="font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                <span>🌀</span> Agitador:
+              </span>
+              <button id="btnStirrer" class="btn btn-outline" onclick="toggleStirrer()">
+                OFF
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetría & Tutor Guiado -->
+        <div class="card">
+          <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <span>📊</span> Telemetría de la Disolución
+          </h2>
+
+          <div class="telemetry-row">
+            <span class="telemetry-label">pH de la Solución:</span>
+            <span class="telemetry-value" id="labPhValue">7.00 (Neutro)</span>
+          </div>
+          <div class="ph-gradient-bar">
+            <div class="ph-indicator-pin" id="phPin" style="left: 50%;"></div>
+          </div>
+
+          <div class="telemetry-row">
+            <span class="telemetry-label">Temperatura:</span>
+            <span class="telemetry-value" id="labTempValue">20.0 °C (293.15 K)</span>
+          </div>
+
+          <div class="telemetry-row">
+            <span class="telemetry-label">Volumen de Solución:</span>
+            <span class="telemetry-value" id="labVolumeValue">150.0 mL</span>
+          </div>
+
+          <div class="telemetry-row">
+            <span class="telemetry-label">Iones y Precipitados:</span>
+            <span class="telemetry-value" id="labIonsValue">H₂O pura</span>
+          </div>
+
+          <!-- Tutor y Bitácora Activa -->
+          <div style="margin-top: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <h3 style="font-size: 0.9rem; font-weight: 700;">Bitácora & Tutor Activo</h3>
+              <select id="guideSelector" onchange="selectLabGuide(this.value)" style="padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; border: 1px solid var(--border-soft);">
+                <option value="none">🔬 Experimento Libre</option>
+                <option value="acid_base">Guía 1: Neutralización Ácido-Base</option>
+                <option value="redox_sodium">Guía 2: Redox del Sodio en Agua</option>
+                <option value="gold_rain">Guía 3: Precipitado Lluvia de Oro</option>
+                <option value="effervescence">Guía 4: Efervescencia de CO₂</option>
+              </select>
+            </div>
+
+            <div id="tutorInstructions" style="font-size: 0.8rem; background: #e0f2fe; padding: 8px 12px; border-radius: 8px; color: #0369a1; font-weight: 500; margin-bottom: 8px;">
+              Selecciona una guía experimental o añade reactivos libremente para observar fenómenos químicos reales.
+            </div>
+
+            <div class="log-box" id="labLogBox">
+              <div class="log-entry">🧪 Cristalería limpia lista con 150 mL de H₂O a 20.0 °C.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. HERRAMIENTAS & CÁLCULOS -->
+    <section id="tab-tools" class="tab-content">
+      <div class="tools-grid">
+        <!-- Calculadora de Masa Molar -->
+        <div class="card">
+          <h2 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+            <span>⚖️</span> Calculadora de Masa Molar Universal
+          </h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+            Ingresa cualquier fórmula química con subíndices o paréntesis para obtener su desglose estequiométrico porcentual exacto.
+          </p>
+
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <input type="text" id="molarInput" class="search-input" placeholder="Ej: Ca(OH)2, H2SO4, C6H12O6..." value="C6H12O6">
+            <button class="btn btn-primary" onclick="calculateMolarMass()">Calcular</button>
+          </div>
+
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;">
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Ejemplos rápidos:</span>
+            <button class="btn btn-outline" style="padding: 2px 8px; font-size: 0.75rem;" onclick="setMolarExample('H2O')">H₂O</button>
+            <button class="btn btn-outline" style="padding: 2px 8px; font-size: 0.75rem;" onclick="setMolarExample('H2SO4')">H₂SO₄</button>
+            <button class="btn btn-outline" style="padding: 2px 8px; font-size: 0.75rem;" onclick="setMolarExample('CaCO3')">CaCO₃</button>
+            <button class="btn btn-outline" style="padding: 2px 8px; font-size: 0.75rem;" onclick="setMolarExample('C8H9NO2')">Paracetamol (C₈H₉NO₂)</button>
+          </div>
+
+          <div id="molarResults" style="background: var(--bg-subtle); padding: 14px; border-radius: 12px; border: 1px solid var(--border-soft);">
+            <!-- Resultado de la masa molar -->
+          </div>
+        </div>
+
+        <!-- Balanceador de Ecuaciones Químicas -->
+        <div class="card">
+          <h2 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+            <span>📐</span> Balanceador de Ecuaciones Químicas
+          </h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+            Comprobación estricta de la Ley de Conservación de la Materia de Lavoisier: los átomos de reactivos igualan a los de productos.
+          </p>
+
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <input type="text" id="eqInput" class="search-input" placeholder="Ej: Fe + O2 -> Fe2O3" value="CH4 + O2 -> CO2 + H2O">
+            <button class="btn btn-primary" onclick="balanceEquation()">Balancear</button>
+          </div>
+
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;">
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Reacciones tipo:</span>
+            <button class="btn btn-outline" style="padding: 2px 8px; font-size: 0.75rem;" onclick="setEqExample('H2 + O2 -> H2O')">Síntesis H₂O</button>
+            <button class="btn btn-outline" style="padding: 2px 8px; font-size: 0.75rem;" onclick="setEqExample('CH4 + O2 -> CO2 + H2O')">Combustión Metano</button>
+            <button class="btn btn-outline" style="padding: 2px 8px; font-size: 0.75rem;" onclick="setEqExample('Fe + O2 -> Fe2O3')">Oxidación Hierro</button>
+          </div>
+
+          <div id="eqResults" style="background: var(--bg-subtle); padding: 14px; border-radius: 12px; border: 1px solid var(--border-soft);">
+            <!-- Resultado de la ecuación balanceada -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. QUIZ & DESAFÍO -->
+    <section id="tab-quiz" class="tab-content">
+      <div class="quiz-container card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border-soft); padding-bottom: 12px;">
+          <div>
+            <h2 style="font-size: 1.2rem; font-weight: 800;">Quiz de Conocimientos Químicos</h2>
+            <p style="font-size: 0.8rem; color: var(--text-muted);" id="quizCounter">Pregunta 1 de 5</p>
+          </div>
+          <div id="quizStreak" style="font-weight: 800; color: #ea580c; background: #ffedd5; padding: 6px 14px; border-radius: 20px; font-size: 0.9rem;">
+            🔥 Racha: 0
+          </div>
+        </div>
+
+        <h3 id="quizQuestion" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 18px; line-height: 1.4;">
+          Pregunta...
+        </h3>
+
+        <div id="quizOptions">
+          <!-- Opciones de respuesta -->
+        </div>
+
+        <div id="quizFeedback" style="display: none; padding: 14px; border-radius: 12px; margin-top: 16px; font-size: 0.9rem; line-height: 1.5;">
+          <!-- Retroalimentación teórica -->
+        </div>
+
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+          <button id="btnNextQuiz" class="btn btn-primary" style="display: none;" onclick="nextQuizQuestion()">
+            Siguiente Pregunta ➡️
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL INSPECTOR CUÁNTICO DE ÁTOMOS -->
+  <div class="modal-overlay" id="quantumModal" onclick="handleModalBackdropClick(event)">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span id="modalElementBadge" style="padding: 4px 10px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 1.1rem;">H</span>
+          <span id="modalElementName">Hidrógeno (Z = 1)</span>
+        </div>
+        <button class="modal-close" onclick="closeQuantumModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Columna Izquierda: Selector de Modelo y Visualizador Canvas -->
+        <div>
+          <!-- SELECTOR DE MODELO ATÓMICO EXIGIDO POR EL USUARIO -->
+          <div class="model-switcher-container">
+            <button id="btnModelQuantum" class="model-switch-btn active" onclick="switchAtomModel('quantum')">
+              <span>⚛️</span> Modelo Cuántico (|Ψ|²)
+            </button>
+            <button id="btnModelBohr" class="model-switch-btn" onclick="switchAtomModel('bohr')">
+              <span>🪐</span> Modelo Clásico (Bohr)
+            </button>
+          </div>
+
+          <div class="atom-canvas-wrapper">
+            <canvas id="atomSimulationCanvas" width="400" height="400"></canvas>
+          </div>
+
+          <div id="modelExplainerText" style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted); text-align: center; line-height: 1.4;">
+            Función de onda probabilística calculada mediante la ecuación de Schrödinger para orbitales atómicos.
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Propiedades Físico-Químicas Completas -->
+        <div>
+          <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 10px;">Ficha Técnica Cuántica</h3>
+          
+          <div class="atom-info-grid">
+            <div class="info-tile">
+              <div class="info-tile-label">Masa Atómica</div>
+              <div class="info-tile-val" id="infoMass">1.008 u</div>
+            </div>
+            <div class="info-tile">
+              <div class="info-tile-label">Electronegatividad</div>
+              <div class="info-tile-val" id="infoElectronegativity">2.20</div>
+            </div>
+            <div class="info-tile">
+              <div class="info-tile-label">Config. Electrónica</div>
+              <div class="info-tile-val" id="infoConfig" style="font-size: 0.85rem;">1s¹</div>
+            </div>
+            <div class="info-tile">
+              <div class="info-tile-label">Bloque / Capa</div>
+              <div class="info-tile-val" id="infoBlock">Bloque s</div>
+            </div>
+            <div class="info-tile">
+              <div class="info-tile-label">Punto de Fusión</div>
+              <div class="info-tile-val" id="infoMelting">-259.1 °C</div>
+            </div>
+            <div class="info-tile">
+              <div class="info-tile-label">e⁻ de Valencia</div>
+              <div class="info-tile-val" id="infoValence">1</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px;">
+            <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">
+              Descripción y Aplicaciones
+            </h4>
+            <p id="infoDescription" style="font-size: 0.85rem; color: var(--text-main); line-height: 1.6;">
+              Elemento químico primordial y más abundante en el universo.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// =================================================================
+// TABLA PERIÓDICA INTERACTIVA - MOTOR EDUCATIVO CONSOLIDADO
+// =================================================================
+
+// 1. BANCO DE DATOS DE LOS 118 ELEMENTOS
+const RAW_ELEMENTS = [[1,"H","Hidrógeno","1.008","nonmetal",1,1,"1s¹","2.20","-259.1 °C","s",1,1],[2,"He","Helio","4.002","noble",1,18,"1s²","-","-272.2 °C","s",2,0],[3,"Li","Litio","6.94","alkali",2,1,"[He] 2s¹","0.98","180.5 °C","s",1,1],[4,"Be","Berilio","9.012","alkaline",2,2,"[He] 2s²","1.57","1287 °C","s",2,2],[5,"B","Boro","10.81","metalloid",2,13,"[He] 2s² 2p¹","2.04","2076 °C","p",3,3],[6,"C","Carbono","12.011","nonmetal",2,14,"[He] 2s² 2p²","2.55","3550 °C","p",4,4],[7,"N","Nitrógeno","14.007","nonmetal",2,15,"[He] 2s² 2p³","3.04","-210.0 °C","p",5,3],[8,"O","Oxígeno","15.999","nonmetal",2,16,"[He] 2s² 2p⁴","3.44","-218.7 °C","p",6,2],[9,"F","Flúor","18.998","halogen",2,17,"[He] 2s² 2p⁵","3.98","-219.6 °C","p",7,1],[10,"Ne","Neón","20.180","noble",2,18,"[He] 2s² 2p⁶","-","-248.6 °C","p",8,0],[11,"Na","Sodio","22.990","alkali",3,1,"[Ne] 3s¹","0.93","97.8 °C","s",1,1],[12,"Mg","Magnesio","24.305","alkaline",3,2,"[Ne] 3s²","1.31","650.0 °C","s",2,2],[13,"Al","Aluminio","26.982","post-trans",3,13,"[Ne] 3s² 3p¹","1.61","660.3 °C","p",3,3],[14,"Si","Silicio","28.085","metalloid",3,14,"[Ne] 3s² 3p²","1.90","1414 °C","p",4,4],[15,"P","Fósforo","30.974","nonmetal",3,15,"[Ne] 3s² 3p³","2.19","44.1 °C","p",5,3],[16,"S","Azufre","32.06","nonmetal",3,16,"[Ne] 3s² 3p⁴","2.58","115.2 °C","p",6,2],[17,"Cl","Cloro","35.45","halogen",3,17,"[Ne] 3s² 3p⁵","3.16","-101.5 °C","p",7,1],[18,"Ar","Argón","39.95","noble",3,18,"[Ne] 3s² 3p⁶","-","-189.3 °C","p",8,0],[19,"K","Potasio","39.098","alkali",4,1,"[Ar] 4s¹","0.82","63.5 °C","s",1,1],[20,"Ca","Calcio","40.078","alkaline",4,2,"[Ar] 4s²","1.00","842.0 °C","s",2,2],[21,"Sc","Escandio","44.956","transition",4,3,"[Ar] 3d¹ 4s²","1.36","1541 °C","d",3,3],[22,"Ti","Titanio","47.867","transition",4,4,"[Ar] 3d² 4s²","1.54","1668 °C","d",4,4],[23,"V","Vanadio","50.942","transition",4,5,"[Ar] 3d³ 4s²","1.63","1910 °C","d",5,5],[24,"Cr","Cromo","51.996","transition",4,6,"[Ar] 3d⁵ 4s¹","1.66","1907 °C","d",6,6],[25,"Mn","Manganeso","54.938","transition",4,7,"[Ar] 3d⁵ 4s²","1.55","1246 °C","d",7,4],[26,"Fe","Hierro","55.845","transition",4,8,"[Ar] 3d⁶ 4s²","1.83","1538 °C","d",8,3],[27,"Co","Cobalto","58.933","transition",4,9,"[Ar] 3d⁷ 4s²","1.88","1495 °C","d",9,3],[28,"Ni","Níquel","58.693","transition",4,10,"[Ar] 3d⁸ 4s²","1.91","1455 °C","d",10,2],[29,"Cu","Cobre","63.546","transition",4,11,"[Ar] 3d¹⁰ 4s¹","1.90","1084.6 °C","d",1,2],[30,"Zn","Zinc","65.38","transition",4,12,"[Ar] 3d¹⁰ 4s²","1.65","419.5 °C","d",2,2],[31,"Ga","Galio","69.723","post-trans",4,13,"[Ar] 3d¹⁰ 4s² 4p¹","1.81","29.8 °C","p",3,3],[32,"Ge","Germanio","72.630","metalloid",4,14,"[Ar] 3d¹⁰ 4s² 4p²","2.01","938.3 °C","p",4,4],[33,"As","Arsénico","74.922","metalloid",4,15,"[Ar] 3d¹⁰ 4s² 4p³","2.18","817 °C","p",5,3],[34,"Se","Selenio","78.971","nonmetal",4,16,"[Ar] 3d¹⁰ 4s² 4p⁴","2.55","221 °C","p",6,2],[35,"Br","Bromo","79.904","halogen",4,17,"[Ar] 3d¹⁰ 4s² 4p⁵","2.96","-7.2 °C","p",7,1],[36,"Kr","Kriptón","83.798","noble",4,18,"[Ar] 3d¹⁰ 4s² 4p⁶","3.00","-157.4 °C","p",8,0],[37,"Rb","Rubidio","85.468","alkali",5,1,"[Kr] 5s¹","0.82","39.3 °C","s",1,1],[38,"Sr","Estroncio","87.62","alkaline",5,2,"[Kr] 5s²","0.95","777 °C","s",2,2],[39,"Y","Itrio","88.906","transition",5,3,"[Kr] 4d¹ 5s²","1.22","1526 °C","d",3,3],[40,"Zr","Circonio","91.224","transition",5,4,"[Kr] 4d² 5s²","1.33","1855 °C","d",4,4],[41,"Nb","Niobio","92.906","transition",5,5,"[Kr] 4d⁴ 5s¹","1.60","2477 °C","d",5,5],[42,"Mo","Molibdeno","95.95","transition",5,6,"[Kr] 4d⁵ 5s¹","2.16","2623 °C","d",6,6],[43,"Tc","Tecnecio","98","transition",5,7,"[Kr] 4d⁵ 5s²","1.90","2157 °C","d",7,4],[44,"Ru","Rutenio","101.07","transition",5,8,"[Kr] 4d⁷ 5s¹","2.20","2334 °C","d",8,3],[45,"Rh","Rodio","102.91","transition",5,9,"[Kr] 4d⁸ 5s¹","2.28","1964 °C","d",9,3],[46,"Pd","Paladio","106.42","transition",5,10,"[Kr] 4d¹⁰","2.20","1554.9 °C","d",10,2],[47,"Ag","Plata","107.87","transition",5,11,"[Kr] 4d¹⁰ 5s¹","1.93","961.8 °C","d",1,1],[48,"Cd","Cadmio","112.41","transition",5,12,"[Kr] 4d¹⁰ 5s²","1.69","321.1 °C","d",2,2],[49,"In","Indio","114.82","post-trans",5,13,"[Kr] 4d¹⁰ 5s² 5p¹","1.78","156.6 °C","p",3,3],[50,"Sn","Estaño","118.71","post-trans",5,14,"[Kr] 4d¹⁰ 5s² 5p²","1.96","231.9 °C","p",4,4],[51,"Sb","Antimonio","121.76","metalloid",5,15,"[Kr] 4d¹⁰ 5s² 5p³","2.05","630.6 °C","p",5,3],[52,"Te","Telurio","127.60","metalloid",5,16,"[Kr] 4d¹⁰ 5s² 5p⁴","2.10","449.5 °C","p",6,2],[53,"I","Yodo","126.90","halogen",5,17,"[Kr] 4d¹⁰ 5s² 5p⁵","2.66","113.7 °C","p",7,1],[54,"Xe","Xenón","131.29","noble",5,18,"[Kr] 4d¹⁰ 5s² 5p⁶","2.60","-111.8 °C","p",8,0],[55,"Cs","Cesio","132.91","alkali",6,1,"[Xe] 6s¹","0.79","28.4 °C","s",1,1],[56,"Ba","Bario","137.33","alkaline",6,2,"[Xe] 6s²","0.89","727 °C","s",2,2],[57,"La","Lantano","138.91","lanthanide",9,3,"[Xe] 5d¹ 6s²","1.10","920 °C","f",3,3],[58,"Ce","Cerio","140.12","lanthanide",9,4,"[Xe] 4f¹ 5d¹ 6s²","1.12","798 °C","f",4,3],[59,"Pr","Praseodimio","140.91","lanthanide",9,5,"[Xe] 4f³ 6s²","1.13","931 °C","f",5,3],[60,"Nd","Neodimio","144.24","lanthanide",9,6,"[Xe] 4f⁴ 6s²","1.14","1024 °C","f",6,3],[61,"Pm","Prometio","145","lanthanide",9,7,"[Xe] 4f⁵ 6s²","1.13","1042 °C","f",7,3],[62,"Sm","Samario","150.36","lanthanide",9,8,"[Xe] 4f⁶ 6s²","1.17","1072 °C","f",8,3],[63,"Eu","Europio","151.96","lanthanide",9,9,"[Xe] 4f⁷ 6s²","1.20","822 °C","f",9,3],[64,"Gd","Gadolinio","157.25","lanthanide",9,10,"[Xe] 4f⁷ 5d¹ 6s²","1.20","1313 °C","f",10,3],[65,"Tb","Terbio","158.93","lanthanide",9,11,"[Xe] 4f⁹ 6s²","1.20","1356 °C","f",11,3],[66,"Dy","Disprosio","162.50","lanthanide",9,12,"[Xe] 4f¹⁰ 6s²","1.22","1412 °C","f",12,3],[67,"Ho","Holmio","164.93","lanthanide",9,13,"[Xe] 4f¹¹ 6s²","1.23","1474 °C","f",13,3],[68,"Er","Erbio","167.26","lanthanide",9,14,"[Xe] 4f¹² 6s²","1.24","1529 °C","f",14,3],[69,"Tm","Tulio","168.93","lanthanide",9,15,"[Xe] 4f¹³ 6s²","1.25","1545 °C","f",15,3],[70,"Yb","Iterbio","173.05","lanthanide",9,16,"[Xe] 4f¹⁴ 6s²","1.10","824 °C","f",16,3],[71,"Lu","Lutecio","174.97","lanthanide",9,17,"[Xe] 4f¹⁴ 5d¹ 6s²","1.27","1663 °C","d",3,3],[72,"Hf","Hafnio","178.49","transition",6,4,"[Xe] 4f¹⁴ 5d² 6s²","1.30","2233 °C","d",4,4],[73,"Ta","Tántalo","180.95","transition",6,5,"[Xe] 4f¹⁴ 5d³ 6s²","1.50","3017 °C","d",5,5],[74,"W","Wolframio","183.84","transition",6,6,"[Xe] 4f¹⁴ 5d⁴ 6s²","2.36","3422 °C","d",6,6],[75,"Re","Renio","186.21","transition",6,7,"[Xe] 4f¹⁴ 5d⁵ 6s²","1.90","3186 °C","d",7,4],[76,"Os","Osmio","190.23","transition",6,8,"[Xe] 4f¹⁴ 5d⁶ 6s²","2.20","3033 °C","d",8,4],[77,"Ir","Iridio","192.22","transition",6,9,"[Xe] 4f¹⁴ 5d⁷ 6s²","2.20","2446 °C","d",9,4],[78,"Pt","Platino","195.08","transition",6,10,"[Xe] 4f¹⁴ 5d⁹ 6s¹","2.28","1768.3 °C","d",10,4],[79,"Au","Oro","196.97","transition",6,11,"[Xe] 4f¹⁴ 5d¹⁰ 6s¹","2.54","1064.2 °C","d",1,3],[80,"Hg","Mercurio","200.59","transition",6,12,"[Xe] 4f¹⁴ 5d¹⁰ 6s²","2.00","-38.8 °C","d",2,2],[81,"Tl","Talio","204.38","post-trans",6,13,"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹","1.62","304 °C","p",3,1],[82,"Pb","Plomo","207.2","post-trans",6,14,"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²","2.33","327.5 °C","p",4,2],[83,"Bi","Bismuto","208.98","post-trans",6,15,"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³","2.02","271.4 °C","p",5,3],[84,"Po","Polonio","209","post-trans",6,16,"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴","2.00","254 °C","p",6,2],[85,"At","Ástato","210","halogen",6,17,"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵","2.20","302 °C","p",7,1],[86,"Rn","Radón","222","noble",6,18,"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶","2.20","-71 °C","p",8,0],[87,"Fr","Francio","223","alkali",7,1,"[Rn] 7s¹","0.70","27 °C","s",1,1],[88,"Ra","Radio","226","alkaline",7,2,"[Rn] 7s²","0.90","700 °C","s",2,2],[89,"Ac","Actinio","227","actinide",10,3,"[Rn] 6d¹ 7s²","1.10","1050 °C","f",3,3],[90,"Th","Torio","232.04","actinide",10,4,"[Rn] 6d² 7s²","1.30","1750 °C","f",4,4],[91,"Pa","Protactinio","231.04","actinide",10,5,"[Rn] 5f² 6d¹ 7s²","1.50","1568 °C","f",5,5],[92,"U","Uranio","238.03","actinide",10,6,"[Rn] 5f³ 6d¹ 7s²","1.38","1135 °C","f",6,6],[93,"Np","Neptunio","237","actinide",10,7,"[Rn] 5f⁴ 6d¹ 7s²","1.36","644 °C","f",7,5],[94,"Pu","Plutonio","244","actinide",10,8,"[Rn] 5f⁶ 7s²","1.28","640 °C","f",8,4],[95,"Am","Americio","243","actinide",10,9,"[Rn] 5f⁷ 7s²","1.30","1176 °C","f",9,3],[96,"Cm","Curio","247","actinide",10,10,"[Rn] 5f⁷ 6d¹ 7s²","1.30","1345 °C","f",10,3],[97,"Bk","Berkelio","247","actinide",10,11,"[Rn] 5f⁹ 7s²","1.30","986 °C","f",11,3],[98,"Cf","Californio","251","actinide",10,12,"[Rn] 5f¹⁰ 7s²","1.30","900 °C","f",12,3],[99,"Es","Einstenio","252","actinide",10,13,"[Rn] 5f¹¹ 7s²","1.30","860 °C","f",13,3],[100,"Fm","Fermio","257","actinide",10,14,"[Rn] 5f¹² 7s²","1.30","1527 °C","f",14,3],[101,"Md","Mendelevio","258","actinide",10,15,"[Rn] 5f¹³ 7s²","1.30","827 °C","f",15,3],[102,"No","Nobelio","259","actinide",10,16,"[Rn] 5f¹⁴ 7s²","1.30","827 °C","f",16,2],[103,"Lr","Laurencio","266","actinide",10,17,"[Rn] 5f¹⁴ 7s² 7p¹","1.30","1627 °C","d",3,3],[104,"Rf","Rutherfordio","267","transition",7,4,"[Rn] 5f¹⁴ 6d² 7s²","-","2100 °C","d",4,4],[105,"Db","Dubnio","268","transition",7,5,"[Rn] 5f¹⁴ 6d³ 7s²","-","-","d",5,5],[106,"Sg","Seaborgio","269","transition",7,6,"[Rn] 5f¹⁴ 6d⁴ 7s²","-","-","d",6,6],[107,"Bh","Bohrio","270","transition",7,7,"[Rn] 5f¹⁴ 6d⁵ 7s²","-","-","d",7,5],[108,"Hs","Hassio","277","transition",7,8,"[Rn] 5f¹⁴ 6d⁶ 7s²","-","-","d",8,4],[109,"Mt","Meitnerio","278","transition",7,9,"[Rn] 5f¹⁴ 6d⁷ 7s²","-","-","d",9,3],[110,"Ds","Darmstadtio","281","transition",7,10,"[Rn] 5f¹⁴ 6d⁸ 7s²","-","-","d",10,2],[111,"Rg","Roentgenio","282","transition",7,11,"[Rn] 5f¹⁴ 6d⁹ 7s²","-","-","d",1,3],[112,"Cn","Copernicio","285","transition",7,12,"[Rn] 5f¹⁴ 6d¹⁰ 7s²","-","-","d",2,2],[113,"Nh","Nihonio","286","post-trans",7,13,"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹","-","430 °C","p",3,1],[114,"Fl","Flerovio","289","post-trans",7,14,"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²","-","-73 °C","p",4,2],[115,"Mc","Moscovio","290","post-trans",7,15,"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³","-","400 °C","p",5,3],[116,"Lv","Livermorio","293","post-trans",7,16,"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴","-","435 °C","p",6,2],[117,"Ts","Teneso","294","halogen",7,17,"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵","-","450 °C","p",7,1],[118,"Og","Oganesón","294","noble",7,18,"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶","-","50 °C","p",8,0]];
+
+// Estructura normalizada de elementos
+const ELEMENTS = RAW_ELEMENTS.map(el => ({
+  z: el[0],
+  sym: el[1],
+  name: el[2],
+  mass: el[3],
+  cat: el[4],
+  period: el[5],
+  group: el[6],
+  config: el[7],
+  en: el[8] === '-' ? null : parseFloat(el[8]),
+  melting: el[9],
+  block: el[10],
+  valElectrons: el[11],
+  oxidation: el[12]
+}));
+
+// Mapeo de Categorías en Tonos Pastel
+
+const CATEGORIES = {
+  'nonmetal': { name: 'No Metales', bg: 'rgba(34, 197, 94, 0.16)', border: 'rgba(74, 222, 128, 0.35)', text: '#86efac', dot: '#22c55e' },
+  'noble': { name: 'Gases Nobles', bg: 'rgba(168, 85, 247, 0.16)', border: 'rgba(192, 132, 252, 0.35)', text: '#d8b4fe', dot: '#a855f7' },
+  'alkali': { name: 'Alcalinos', bg: 'rgba(239, 68, 68, 0.16)', border: 'rgba(248, 113, 113, 0.35)', text: '#fca5a5', dot: '#ef4444' },
+  'alkaline': { name: 'Alcalinotérreos', bg: 'rgba(249, 115, 22, 0.16)', border: 'rgba(251, 146, 60, 0.35)', text: '#fdba74', dot: '#f97316' },
+  'metalloid': { name: 'Metaloides', bg: 'rgba(234, 179, 8, 0.16)', border: 'rgba(250, 204, 21, 0.35)', text: '#fde047', dot: '#eab308' },
+  'halogen': { name: 'Halógenos', bg: 'rgba(6, 182, 212, 0.16)', border: 'rgba(34, 211, 238, 0.35)', text: '#67e8f9', dot: '#06b6d4' },
+  'transition': { name: 'Metales de Transición', bg: 'rgba(99, 102, 241, 0.16)', border: 'rgba(129, 140, 248, 0.35)', text: '#a5b4fc', dot: '#6366f1' },
+  'post-trans': { name: 'Metales Post-transición', bg: 'rgba(148, 163, 184, 0.14)', border: 'rgba(203, 213, 225, 0.3)', text: '#cbd5e1', dot: '#94a3b8' },
+  'lanthanide': { name: 'Lantánidos', bg: 'rgba(236, 72, 153, 0.16)', border: 'rgba(244, 114, 182, 0.35)', text: '#f472b6', dot: '#ec4899' },
+  'actinide': { name: 'Actínidos', bg: 'rgba(139, 92, 246, 0.16)', border: 'rgba(167, 139, 250, 0.35)', text: '#c4b5fd', dot: '#8b5cf6' }
+};
+
+// 2. EFECTOS SONOROS MEDIANTE WEB AUDIO API (Sin archivos externos)
+const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx && AudioContextClass) {
+    audioCtx = new AudioContextClass();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+function playWaterDropSound() {
+  try {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const now = ctx.currentTime;
+    
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, now);
+    osc.frequency.exponentialRampToValueAtTime(320, now + 0.12);
+    
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    osc.start(now);
+    osc.stop(now + 0.15);
+  } catch (e) {}
+}
+
+function playChimeSound() {
+  try {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now + i * 0.06);
+      gain.gain.setValueAtTime(0.12, now + i * 0.06);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.3);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + i * 0.06);
+      osc.stop(now + i * 0.06 + 0.3);
+    });
+  } catch (e) {}
+}
+
+function playReactionFizzSound() {
+  try {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    const bufferSize = ctx.sampleRate * 0.35;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(1400, ctx.currentTime);
+    filter.Q.setValueAtTime(3.0, ctx.currentTime);
+    
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+    
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    
+    noise.start();
+  } catch (e) {}
+}
+
+
+// Control del Menú Hamburguesa / Drawer Móvil
+function toggleMobileMenu() {
+  const drawer = document.getElementById('mobileMenuDrawer');
+  const btn = document.getElementById('mobileMenuBtn');
+  if (!drawer) return;
+  const isOpen = drawer.classList.contains('active');
+  if (isOpen) {
+    drawer.classList.remove('active');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  } else {
+    drawer.classList.add('active');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+  }
+}
+
+function handleMobileNav(tabId) {
+  switchTab(tabId);
+  toggleMobileMenu();
+}
+
+// 3. NAVEGACIÓN ENTRE PESTAÑAS
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.mobile-nav-card').forEach(el => el.classList.remove('active'));
+
+  const targetContent = document.getElementById(tabId);
+  if (targetContent) targetContent.classList.add('active');
+
+  const activeBtn = Array.from(document.querySelectorAll('.nav-tab')).find(btn => 
+    btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tabId)
+  );
+  if (activeBtn) activeBtn.classList.add('active');
+
+  const activeMobileBtn = document.querySelector(`.mobile-nav-card[data-tab="${tabId}"]`);
+  if (activeMobileBtn) activeMobileBtn.classList.add('active');
+
+  if (tabId === 'tab-builder') {
+    resizeWorkbenchCanvas();
+  }
+}
+
+// 4. RENDERIZADO DE LA TABLA PERIÓDICA Y LEYENDA
+let activeCategoryFilter = null;
+let searchQuery = '';
+
+function renderLegend() {
+  const container = document.getElementById('legendContainer');
+  if (!container) return;
+  container.innerHTML = '';
+
+  Object.keys(CATEGORIES).forEach(catKey => {
+    const cat = CATEGORIES[catKey];
+    const chip = document.createElement('div');
+    chip.className = 'legend-chip';
+    chip.style.backgroundColor = cat.bg;
+    chip.style.borderColor = cat.border;
+    chip.style.color = cat.text;
+    if (activeCategoryFilter === catKey) chip.classList.add('active');
+
+    chip.innerHTML = `<span class="legend-dot" style="background-color: ${cat.dot};"></span> ${cat.name}`;
+    chip.onclick = () => {
+      activeCategoryFilter = activeCategoryFilter === catKey ? null : catKey;
+      renderLegend();
+      applyFilters();
+    };
+    container.appendChild(chip);
+  });
+}
+
+function renderPeriodicTable() {
+  const grid = document.getElementById('periodicTableGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  // Matriz de 10 filas x 18 columnas
+  const cells = Array(10).fill(null).map(() => Array(18).fill(null));
+
+  ELEMENTS.forEach(el => {
+    let r = el.period - 1;
+    let c = el.group - 1;
+    if (el.cat === 'lanthanide') {
+      r = 8;
+      c = el.z - 57 + 2; // de columna 3 a 17
+    } else if (el.cat === 'actinide') {
+      r = 9;
+      c = el.z - 89 + 2; // de columna 3 a 17
+    }
+    if (r >= 0 && r < 10 && c >= 0 && c < 18) {
+      cells[r][c] = el;
+    }
+  });
+
+  for (let r = 0; r < 10; r++) {
+    for (let c = 0; c < 18; c++) {
+      // Placeholders para La* y Ac** en la tabla principal
+      if (r === 5 && c === 2) {
+        const ph = document.createElement('div');
+        ph.className = 'placeholder-card';
+        ph.innerHTML = '<span>57-71</span><span style="font-size:0.6rem;">La-Lu</span>';
+        grid.appendChild(ph);
+        continue;
+      }
+      if (r === 6 && c === 2) {
+        const ph = document.createElement('div');
+        ph.className = 'placeholder-card';
+        ph.innerHTML = '<span>89-103</span><span style="font-size:0.6rem;">Ac-Lr</span>';
+        grid.appendChild(ph);
+        continue;
+      }
+
+      // Espacio separador entre cuerpo principal y filas lantánidos/actínidos
+      if (r === 7) {
+        const empty = document.createElement('div');
+        empty.style.height = '14px';
+        grid.appendChild(empty);
+        continue;
+      }
+
+      const el = cells[r][c];
+      if (!el) {
+        const empty = document.createElement('div');
+        grid.appendChild(empty);
+      } else {
+        const card = document.createElement('div');
+        card.className = `element-card cat-${el.cat}`;
+        card.id = `el-${el.z}`;
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="el-z">${el.z}</span>
+            <span class="el-mass">${el.mass}</span>
+          </div>
+          <div class="el-symbol">${el.sym}</div>
+          <div class="el-name">${el.name}</div>
+        `;
+
+        // Efecto de onda de agua (Water Ripple) y apertura de modal cuántico
+        card.addEventListener('click', (e) => {
+          triggerRipple(card, e);
+          playWaterDropSound();
+          openQuantumModal(el);
+        });
+
+        grid.appendChild(card);
+      }
+    }
+  }
+}
+
+function triggerRipple(card, e) {
+  const rect = card.getBoundingClientRect();
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  const size = Math.max(rect.width, rect.height);
+  ripple.style.width = ripple.style.height = `${size}px`;
+  ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+  ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
+  card.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 600);
+}
+
+function handleSearch(val) {
+  searchQuery = val.trim().toLowerCase();
+  applyFilters();
+}
+
+function resetFilters() {
+  searchQuery = '';
+  activeCategoryFilter = null;
+  document.getElementById('searchInput').value = '';
+  renderLegend();
+  applyFilters();
+}
+
+function applyFilters() {
+  ELEMENTS.forEach(el => {
+    const card = document.getElementById(`el-${el.z}`);
+    if (!card) return;
+
+    let matchesSearch = true;
+    if (searchQuery) {
+      matchesSearch = el.name.toLowerCase().includes(searchQuery) ||
+                            el.sym.toLowerCase().includes(searchQuery) ||
+                            el.z.toString() === searchQuery;
+    }
+
+    let matchesCategory = true;
+    if (activeCategoryFilter) {
+      matchesCategory = el.cat === activeCategoryFilter;
+    }
+
+    if (matchesSearch && matchesCategory) {
+      card.classList.remove('dimmed');
+    } else {
+      card.classList.add('dimmed');
+    }
+  });
+}
+
+// 5. MODAL INSPECTOR CUÁNTICO & SELECTOR DE MODELO (CUÁNTICO VS BOHR)
+let currentSelectedElement = ELEMENTS[0];
+let currentAtomModel = 'quantum'; // 'quantum' o 'bohr'
+let atomAnimFrameId = null;
+let atomAnimAngle = 0;
+
+function openQuantumModal(element) {
+  currentSelectedElement = element;
+  const modal = document.getElementById('quantumModal');
+  if (!modal) return;
+
+  const badge = document.getElementById('modalElementBadge');
+  const cat = CATEGORIES[element.cat] || CATEGORIES['nonmetal'];
+  badge.textContent = element.sym;
+  badge.style.backgroundColor = cat.bg;
+  badge.style.color = cat.text;
+  badge.style.border = `1px solid ${cat.border}`;
+
+  document.getElementById('modalElementName').textContent = `${element.name} (Z = ${element.z})`;
+  document.getElementById('infoMass').textContent = `${element.mass} u`;
+  document.getElementById('infoElectronegativity').textContent = element.en !== null ? element.en.toFixed(2) : 'N/A';
+  document.getElementById('infoConfig').textContent = element.config;
+  document.getElementById('infoBlock').textContent = `Bloque ${element.block} (Periodo ${element.period})`;
+  document.getElementById('infoMelting').textContent = element.melting;
+  document.getElementById('infoValence').textContent = `${element.valElectrons} e⁻`;
+
+  // Descripción didáctica
+  let desc = `El ${element.name} (${element.sym}) es un elemento químico con número atómico ${element.z}. `;
+  if (element.cat === 'noble') {
+    desc += 'Pertenece a los gases nobles; posee capa de valencia cerrada y completa, lo que le confiere una inercia química excepcional bajo condiciones estándar.';
+  } else if (element.cat === 'alkali') {
+    desc += 'Es un metal alcalino altamente reactivo con un único electrón en su capa exterior que cede fácilmente para formar cationes univalentes (+1).';
+  } else if (element.cat === 'halogen') {
+    desc += 'Es un halógeno muy electronegativo con 7 electrones de valencia que busca ávidamente capturar 1 electrón para completar su octeto.';
+  } else if (element.cat === 'transition') {
+    desc += 'Es un metal de transición caracterizado por subniveles d parcialmente ocupados, facilitando múltiples estados de oxidación y complejos coloreados.';
+  } else {
+    desc += 'Desempeña funciones fundamentales en la química molecular, biológica e industrial.';
+  }
+  document.getElementById('infoDescription').textContent = desc;
+
+  modal.classList.add('active');
+  startAtomSimulation();
+}
+
+function closeQuantumModal() {
+  const modal = document.getElementById('quantumModal');
+  if (modal) modal.classList.remove('active');
+  if (atomAnimFrameId) {
+    cancelAnimationFrame(atomAnimFrameId);
+    atomAnimFrameId = null;
+  }
+}
+
+function handleModalBackdropClick(e) {
+  if (e.target.id === 'quantumModal') {
+    closeQuantumModal();
+  }
+}
+
+// Selector de Modelo Atómico Requerido
+function switchAtomModel(model) {
+  currentAtomModel = model;
+  document.getElementById('btnModelQuantum').classList.toggle('active', model === 'quantum');
+  document.getElementById('btnModelBohr').classList.toggle('active', model === 'bohr');
+
+  const explainer = document.getElementById('modelExplainerText');
+  if (model === 'quantum') {
+    explainer.textContent = 'Simulación cuántica de densidad de probabilidad orbital (|Ψ|²) con armónicos esféricos e incertidumbre de Heisenberg.';
+  } else {
+    explainer.textContent = 'Modelo clásico de Niels Bohr (1913): electrones en niveles de energía cuantizados (K, L, M, N...) orbitando alrededor del núcleo.';
+  }
+}
+
+function startAtomSimulation() {
+  if (atomAnimFrameId) {
+    cancelAnimationFrame(atomAnimFrameId);
+  }
+  const canvas = document.getElementById('atomSimulationCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  function renderFrame() {
+    atomAnimAngle += 0.02;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const el = currentSelectedElement;
+
+    if (currentAtomModel === 'quantum') {
+      // SIMULACIÓN CUÁNTICA: Densidad de probabilidad |Ψ|²
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      // Resplandor de fondo cuántico
+      const bgGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, 160);
+      bgGrad.addColorStop(0, 'rgba(14, 165, 233, 0.25)');
+      bgGrad.addColorStop(0.6, 'rgba(99, 102, 241, 0.12)');
+      bgGrad.addColorStop(1, 'rgba(15, 23, 42, 0)');
+      ctx.fillStyle = bgGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, 160, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Nube de puntos de probabilidad cuántica calculada según el bloque (s, p, d, f)
+      const numPoints = 280;
+      for (let i = 0; i < numPoints; i++) {
+        const seed = (i * 1.618033 + atomAnimAngle * 0.4);
+        const theta = (seed % (Math.PI * 2));
+        const phi = (seed * 2.3 % Math.PI);
+        let rProb = 0;
+
+        if (el.block === 's') {
+          // Orbital s esférico
+          rProb = 35 + Math.sin(seed * 4) * 20 + Math.random() * 30;
+        } else if (el.block === 'p') {
+          // Orbital p lobular (dumbbell)
+          const lobe = Math.abs(Math.cos(theta));
+          rProb = 20 + lobe * 95 + Math.random() * 15;
+        } else if (el.block === 'd') {
+          // Orbital d cuadrupolar
+          const lobe = Math.abs(Math.sin(2 * theta));
+          rProb = 20 + lobe * 105 + Math.random() * 18;
+        } else {
+          // Orbital f multilobular
+          const lobe = Math.abs(Math.sin(3 * theta));
+          rProb = 25 + lobe * 110 + Math.random() * 20;
+        }
+
+        const rotX = Math.cos(atomAnimAngle * 0.6) * rProb * Math.cos(theta);
+        const rotY = Math.sin(atomAnimAngle * 0.6) * rProb * Math.cos(theta) * 0.4 + rProb * Math.sin(theta);
+
+        const pointAlpha = Math.max(0.15, 0.75 - (rProb / 150));
+        ctx.fillStyle = el.block === 's' ? `rgba(56, 189, 248, ${pointAlpha})` :
+                        el.block === 'p' ? `rgba(168, 85, 247, ${pointAlpha})` :
+                        el.block === 'd' ? `rgba(234, 179, 8, ${pointAlpha})` :
+                                           `rgba(236, 72, 153, ${pointAlpha})`;
+        ctx.beginPath();
+        ctx.arc(rotX, rotY, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Núcleo cuántico central con fluctuación de energía
+      const corePulse = 14 + Math.sin(atomAnimAngle * 4) * 2;
+      const coreGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, corePulse);
+      coreGrad.addColorStop(0, '#ffffff');
+      coreGrad.addColorStop(0.5, '#0ea5e9');
+      coreGrad.addColorStop(1, 'rgba(14, 165, 233, 0)');
+      ctx.fillStyle = coreGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, corePulse, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Texto de configuración cuántica
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 11px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(`Orbital ${el.block} |Ψ|² (Z=${el.z})`, 0, 150);
+
+      ctx.restore();
+
+    } else {
+      // MODELO CLÁSICO DE BOHR: Órbitas concéntricas y electrones corpusculares
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      // Núcleo denso con protones (rojos) y neutrones (azules)
+      const nucleusRadius = 16;
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.85)';
+      ctx.beginPath();
+      ctx.arc(-3, -3, nucleusRadius * 0.6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.85)';
+      ctx.beginPath();
+      ctx.arc(4, 3, nucleusRadius * 0.6, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Carga nuclear central
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 10px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`+${el.z}`, 0, 0);
+
+      // Distribución electrónica en capas de Bohr: 2, 8, 18, 32...
+      const shellCapacities = [2, 8, 18, 32, 32, 18, 8];
+      let remainingElectrons = el.z;
+      const shellRadii = [40, 65, 90, 115, 135, 155];
+
+      for (let s = 0; s < shellRadii.length && remainingElectrons > 0; s++) {
+        const radius = shellRadii[s];
+        const capacity = shellCapacities[s];
+        const count = Math.min(remainingElectrons, capacity);
+        remainingElectrons -= count;
+
+        // Órbita elíptica/circular suave
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Electrones orbitando
+        const speed = (0.04 / (s + 1)) * (s % 2 === 0 ? 1 : -1);
+        for (let eIdx = 0; eIdx < count; eIdx++) {
+          const angle = (Math.PI * 2 / count) * eIdx + (atomAnimAngle * speed * 25);
+          const ex = Math.cos(angle) * radius;
+          const ey = Math.sin(angle) * radius;
+
+          // Esfera del electrón brillante
+          ctx.fillStyle = '#38bdf8';
+          ctx.shadowColor = '#0ea5e9';
+          ctx.shadowBlur = 6;
+          ctx.beginPath();
+          ctx.arc(ex, ey, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      }
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 11px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(`Capas Bohr (K, L, M, N...) e⁻=${el.z}`, 0, 170);
+
+      ctx.restore();
+    }
+
+    atomAnimFrameId = requestAnimationFrame(renderFrame);
+  }
+
+  renderFrame();
+}
+
+// 6. CONSTRUCTOR UNIVERSAL DE MOLÉCULAS & RENDER 3D
+const workbenchAtoms = [];
+let is3DModeActive = false;
+let rot3DAngleX = 0;
+let rot3DAngleY = 0;
+let draggingAtom = null;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+
+
+function renderUniversalPalette(filterText = '') {
+  const container = document.getElementById('universalPalette');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const q = filterText.toLowerCase().trim();
+  const list = ELEMENTS.filter(el => 
+    !q || el.name.toLowerCase().includes(q) || el.sym.toLowerCase().includes(q) || el.z.toString() === q
+  );
+
+  list.forEach(el => {
+    const item = document.createElement('div');
+    item.className = 'palette-item';
+    const cat = CATEGORIES[el.cat] || CATEGORIES['nonmetal'];
+    item.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="mini-atom-wrap">
+          <div class="mini-orbit-ring"><div class="mini-orbit-electron"></div></div>
+          <div class="mini-orbit-ring"><div class="mini-orbit-electron"></div></div>
+          <div class="mini-atom-core" style="background: ${cat.dot}; box-shadow: 0 0 8px ${cat.dot};"></div>
+        </div>
+        <div style="display: flex; flex-direction: column;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-weight: 800; font-family: 'JetBrains Mono', monospace; background: ${cat.bg}; color: ${cat.text}; padding: 1px 6px; border-radius: 4px; font-size: 0.75rem;">${el.sym}</span>
+            <span style="font-size: 0.85rem; font-weight: 700; color: #f8fafc;">${el.name}</span>
+          </div>
+          <span style="font-size: 0.7rem; color: #94a3b8;">Z=${el.z} • ${el.block}-block</span>
+        </div>
+      </div>
+      <button style="font-size: 0.75rem; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); padding: 4px 10px; border-radius: 6px; cursor: pointer;">
+        + Agregar
+      </button>
+    `;
+    item.onclick = () => addAtomToWorkbench(el);
+    container.appendChild(item);
+  });
+}
+
+
+function filterPalette(val) {
+  renderUniversalPalette(val);
+}
+
+function addAtomToWorkbench(element, x = null, y = null) {
+  const canvas = document.getElementById('workbenchCanvas');
+  const cx = x !== null ? x : (canvas ? canvas.width / 2 + (Math.random() * 80 - 40) : 200);
+  const cy = y !== null ? y : (canvas ? canvas.height / 2 + (Math.random() * 80 - 40) : 200);
+
+  // Colores estándar CPK / didácticos
+  let color = '#94a3b8';
+  if (element.sym === 'H') color = '#ffffff';
+  else if (element.sym === 'C') color = '#334155';
+  else if (element.sym === 'N') color = '#3b82f6';
+  else if (element.sym === 'O') color = '#ef4444';
+  else if (element.sym === 'F' || element.sym === 'Cl') color = '#10b981';
+  else if (element.sym === 'Na' || element.sym === 'K') color = '#a855f7';
+  else if (element.sym === 'Ca') color = '#f97316';
+
+  workbenchAtoms.push({
+    id: Date.now() + Math.random(),
+    element: element,
+    x: cx,
+    y: cy,
+    z: (Math.random() - 0.5) * 60,
+    radius: Math.max(16, Math.min(28, 12 + element.valElectrons * 2)),
+    color: color
+  });
+
+  updateAtomCounter();
+  evaluateFeasibility();
+}
+
+function updateAtomCounter() {
+  const badge = document.getElementById('atomCounter');
+  if (badge) badge.textContent = `${workbenchAtoms.length} átomo${workbenchAtoms.length === 1 ? '' : 's'}`;
+}
+
+function clearWorkbench() {
+  workbenchAtoms.length = 0;
+  is3DModeActive = false;
+  document.getElementById('btnToggle3D').classList.remove('btn-primary');
+  document.getElementById('btnToggle3D').classList.add('btn-outline');
+  updateAtomCounter();
+  evaluateFeasibility();
+}
+
+function toggle3DAnimation() {
+  is3DModeActive = !is3DModeActive;
+  const btn = document.getElementById('btnToggle3D');
+  if (is3DModeActive) {
+    btn.classList.remove('btn-outline');
+    btn.classList.add('btn-primary');
+    btn.innerHTML = '<span>⏸️</span> Pausar 3D';
+  } else {
+    btn.classList.remove('btn-primary');
+    btn.classList.add('btn-outline');
+    btn.innerHTML = '<span>🌐</span> Animar en 3D';
+  }
+}
+
+// Validación Estricta de Factibilidad Química (Gases Nobles, Metales puros y EN)
+function evaluateFeasibility() {
+  const container = document.getElementById('feasibilityCard');
+  if (!container) return;
+
+  if (workbenchAtoms.length === 0) {
+    container.innerHTML = '<p style="font-size: 0.85rem; color: var(--text-muted);">El lienzo está vacío. Selecciona elementos del banco de 1 a 118 para evaluar combinaciones.</p>';
+    return;
+  }
+
+  // Recuento de elementos
+  const counts = {};
+  workbenchAtoms.forEach(a => {
+    counts[a.element.sym] = (counts[a.element.sym] || 0) + 1;
+  });
+
+  // Comprobar gases nobles
+  const nobleAtom = workbenchAtoms.find(a => a.element.cat === 'noble');
+  if (nobleAtom && workbenchAtoms.length > 1) {
+    container.innerHTML = `
+      <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(248, 113, 113, 0.35); padding: 12px; border-radius: 10px; color: #fca5a5; font-size: 0.85rem; line-height: 1.5;">
+        <div style="font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+          <span>🚫</span> Combinación Imposible: Gas Noble Bloqueado
+        </div>
+        El elemento <b>${nobleAtom.element.name} (${nobleAtom.element.sym})</b> tiene su capa de valencia energéticamente saturada (octeto completo / dueto en He). Su energía de ionización es extremadamente alta y su afinidad electrónica prácticamente nula, por lo que no forma enlaces covalentes ordinarios.
+      </div>
+    `;
+    return;
+  }
+
+  // Comprobar metal con metal
+  const metals = workbenchAtoms.filter(a => ['alkali', 'alkaline', 'transition', 'post-trans', 'lanthanide', 'actinide'].includes(a.element.cat));
+  if (metals.length === workbenchAtoms.length && workbenchAtoms.length > 1) {
+    container.innerHTML = `
+      <div style="background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(250, 204, 21, 0.35); padding: 12px; border-radius: 10px; color: #fde047; font-size: 0.85rem; line-height: 1.5;">
+        <div style="font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+          <span>⚠️</span> Enlace Metálico (Red Cristalográfica)
+        </div>
+        La unión exclusiva entre metales no genera moléculas discretas aisladas; forma una red cristalina metálica tridimensional cohesionada por un "mar de electrones deslocalizados" (aleación metálica).
+      </div>
+    `;
+    return;
+  }
+
+  // Identificar compuestos reconocidos
+  let recognizedName = null;
+  let formulaText = '';
+  Object.keys(counts).forEach(sym => {
+    formulaText += sym + (counts[sym] > 1 ? counts[sym] : '');
+  });
+
+  if (counts['H'] === 2 && counts['O'] === 1 && Object.keys(counts).length === 2) recognizedName = 'Agua (H₂O) - Solvente universal polar';
+  else if (counts['C'] === 1 && counts['O'] === 2 && Object.keys(counts).length === 2) recognizedName = 'Dióxido de Carbono (CO₂) - Covalente no polar lineal';
+  else if (counts['C'] === 1 && counts['H'] === 4 && Object.keys(counts).length === 2) recognizedName = 'Metano (CH₄) - Hidrocarburo tetraédrico';
+  else if (counts['Na'] === 1 && counts['Cl'] === 1 && Object.keys(counts).length === 2) recognizedName = 'Cloruro de Sodio (NaCl) - Red iónica cristalina';
+  else if (counts['N'] === 1 && counts['H'] === 3 && Object.keys(counts).length === 2) recognizedName = 'Amoníaco (NH₃) - Base débil piramidal trigonal';
+  else if (counts['H'] === 1 && counts['Cl'] === 1 && Object.keys(counts).length === 2) recognizedName = 'Ácido Clorhídrico (HCl) - Enlace polar fuerte';
+  else if (counts['Ca'] === 1 && counts['O'] === 1 && Object.keys(counts).length === 2) recognizedName = 'Óxido de Calcio (CaO) - Enlace iónico refractario';
+
+  // Cálculo de Diferencia de Electronegatividad (Delta EN)
+  let enInfo = '';
+  if (workbenchAtoms.length >= 2) {
+    const en1 = workbenchAtoms[0].element.en;
+    const en2 = workbenchAtoms[1].element.en;
+    if (en1 !== null && en2 !== null) {
+      const deltaEN = Math.abs(en1 - en2);
+      let bondType = '';
+      let bondDesc = '';
+      if (deltaEN < 0.4) {
+        bondType = 'Covalente No Polar';
+        bondDesc = 'Los electrones se comparten de manera casi simétrica y equitativa sin formar dipolos permanentes.';
+      } else if (deltaEN <= 1.7) {
+        bondType = 'Covalente Polar';
+        bondDesc = 'Existe una compartición asimétrica de la densidad electrónica generando momentos dipolares (δ⁺ y δ⁻).';
+      } else {
+        bondType = 'Iónico';
+        bondDesc = 'Gran diferencia electrostática: transferencia electrónica con formación neta de aniones y cationes.';
+      }
+
+      enInfo = `
+        <div style="margin-top: 10px; padding: 10px; background: var(--bg-subtle); border-radius: 8px; border: 1px solid var(--border-soft);">
+          <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 0.8rem;">
+            <span>Δ Electronegatividad:</span>
+            <span style="font-family: 'JetBrains Mono', monospace; color: var(--primary);">${deltaEN.toFixed(2)}</span>
+          </div>
+          <div style="font-weight: 700; color: var(--text-main); font-size: 0.85rem; margin-top: 4px;">Tipo de Enlace: ${bondType}</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">${bondDesc}</div>
+        </div>
+      `;
+    }
+  }
+
+  container.innerHTML = `
+    <div style="background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(74, 222, 128, 0.35); padding: 12px; border-radius: 10px; color: #86efac; font-size: 0.85rem; line-height: 1.5;">
+      <div style="font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+        <span>✅</span> Molécula Estable Detectada
+      </div>
+      <div><b>Fórmula Empírica:</b> <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 800;">${formulaText}</span></div>
+      ${recognizedName ? `<div style="margin-top: 4px; color: #15803d; font-weight: 700;">Compuesto Reconocido: ${recognizedName}</div>` : ''}
+      ${enInfo}
+    </div>
+  `;
+}
+
+// Carga de Presets de Moléculas
+function loadPreset(type) {
+  clearWorkbench();
+  const canvas = document.getElementById('workbenchCanvas');
+  const cx = canvas ? canvas.width / 2 : 250;
+  const cy = canvas ? canvas.height / 2 : 240;
+
+  const H = ELEMENTS.find(e => e.sym === 'H');
+  const O = ELEMENTS.find(e => e.sym === 'O');
+  const C = ELEMENTS.find(e => e.sym === 'C');
+  const N = ELEMENTS.find(e => e.sym === 'N');
+  const Cl = ELEMENTS.find(e => e.sym === 'Cl');
+  const Na = ELEMENTS.find(e => e.sym === 'Na');
+  const Ca = ELEMENTS.find(e => e.sym === 'Ca');
+
+  if (type === 'H2O' && H && O) {
+    addAtomToWorkbench(O, cx, cy);
+    addAtomToWorkbench(H, cx - 45, cy + 35);
+    addAtomToWorkbench(H, cx + 45, cy + 35);
+  } else if (type === 'CO2' && C && O) {
+    addAtomToWorkbench(C, cx, cy);
+    addAtomToWorkbench(O, cx - 70, cy);
+    addAtomToWorkbench(O, cx + 70, cy);
+  } else if (type === 'CH4' && C && H) {
+    addAtomToWorkbench(C, cx, cy);
+    addAtomToWorkbench(H, cx, cy - 50);
+    addAtomToWorkbench(H, cx - 50, cy + 25);
+    addAtomToWorkbench(H, cx + 50, cy + 25);
+    addAtomToWorkbench(H, cx, cy + 50);
+  } else if (type === 'NaCl' && Na && Cl) {
+    addAtomToWorkbench(Na, cx - 45, cy);
+    addAtomToWorkbench(Cl, cx + 45, cy);
+  } else if (type === 'NH3' && N && H) {
+    addAtomToWorkbench(N, cx, cy - 10);
+    addAtomToWorkbench(H, cx - 45, cy + 35);
+    addAtomToWorkbench(H, cx + 45, cy + 35);
+    addAtomToWorkbench(H, cx, cy + 45);
+  } else if (type === 'HCl' && H && Cl) {
+    addAtomToWorkbench(H, cx - 40, cy);
+    addAtomToWorkbench(Cl, cx + 40, cy);
+  } else if (type === 'CaO' && Ca && O) {
+    addAtomToWorkbench(Ca, cx - 45, cy);
+    addAtomToWorkbench(O, cx + 45, cy);
+  }
+}
+
+// Bucle de Animación y Renderizado del Lienzo Molecular
+function initWorkbenchEvents() {
+  const canvas = document.getElementById('workbenchCanvas');
+  if (!canvas) return;
+
+  canvas.addEventListener('mousedown', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
+    for (let i = workbenchAtoms.length - 1; i >= 0; i--) {
+      const a = workbenchAtoms[i];
+      const dist = Math.hypot(a.x - mx, a.y - my);
+      if (dist <= a.radius + 6) {
+        draggingAtom = a;
+        dragOffsetX = a.x - mx;
+        dragOffsetY = a.y - my;
+        return;
+      }
+    }
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!draggingAtom) return;
+    const canvas = document.getElementById('workbenchCanvas');
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    draggingAtom.x = e.clientX - rect.left + dragOffsetX;
+    draggingAtom.y = e.clientY - rect.top + dragOffsetY;
+    evaluateFeasibility();
+  });
+
+  window.addEventListener('mouseup', () => {
+    draggingAtom = null;
+  });
+
+  // Soporte táctil nativo para celulares y tablets en Workbench Canvas
+  canvas.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      const mx = touch.clientX - rect.left;
+      const my = touch.clientY - rect.top;
+
+      for (let i = workbenchAtoms.length - 1; i >= 0; i--) {
+        const a = workbenchAtoms[i];
+        const dist = Math.hypot(a.x - mx, a.y - my);
+        if (dist <= a.radius + 12) { // Rango táctil ampliado para el dedo
+          draggingAtom = a;
+          dragOffsetX = a.x - mx;
+          dragOffsetY = a.y - my;
+          e.preventDefault();
+          return;
+        }
+      }
+    }
+  }, { passive: false });
+
+  window.addEventListener('touchmove', (e) => {
+    if (!draggingAtom || e.touches.length === 0) return;
+    const canvas = document.getElementById('workbenchCanvas');
+    if (!canvas) return;
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    draggingAtom.x = touch.clientX - rect.left + dragOffsetX;
+    draggingAtom.y = touch.clientY - rect.top + dragOffsetY;
+    evaluateFeasibility();
+    e.preventDefault();
+  }, { passive: false });
+
+  window.addEventListener('touchend', () => {
+    draggingAtom = null;
+  });
+
+}
+
+function resizeWorkbenchCanvas() {
+  const canvas = document.getElementById('workbenchCanvas');
+  if (!canvas) return;
+  const isMobile = window.innerWidth <= 1024;
+  canvas.width = canvas.parentElement.clientWidth || (isMobile ? 360 : 600);
+  canvas.height = isMobile ? 350 : 480;
+}
+
+
+// Partículas cuánticas de fondo en el Workbench (estrellas de energía)
+const quantumBackgroundParticles = [];
+function initQuantumBackground() {
+  quantumBackgroundParticles.length = 0;
+  for (let i = 0; i < 45; i++) {
+    quantumBackgroundParticles.push({
+      x: Math.random() * 800,
+      y: Math.random() * 500,
+      r: 0.8 + Math.random() * 1.8,
+      speedX: (Math.random() - 0.5) * 0.35,
+      speedY: (Math.random() - 0.5) * 0.35,
+      alpha: 0.2 + Math.random() * 0.5,
+      hue: Math.random() > 0.5 ? '#38bdf8' : '#818cf8'
+    });
+  }
+}
+initQuantumBackground();
+
+
+function startWorkbenchLoop() {
+  const canvas = document.getElementById('workbenchCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let time = 0;
+
+  function loop() {
+    time += 0.025;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+
+    // A. RENDER PARTÍCULAS FLOTANTES DE FONDO (Energía Cuántica Estelar)
+    quantumBackgroundParticles.forEach(p => {
+      p.x += p.speedX;
+      p.y += p.speedY;
+      if (p.x < 0) p.x = canvas.width;
+      if (p.x > canvas.width) p.x = 0;
+      if (p.y < 0) p.y = canvas.height;
+      if (p.y > canvas.height) p.y = 0;
+
+      const pulseAlpha = Math.max(0.12, p.alpha + Math.sin(time * 2 + p.x) * 0.15);
+      ctx.fillStyle = p.hue;
+      ctx.globalAlpha = pulseAlpha;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
+    });
+
+    if (is3DModeActive) {
+      rot3DAngleY += 0.015;
+      rot3DAngleX = Math.sin(rot3DAngleY * 0.5) * 0.3;
+    }
+
+    // B. VIBRACIÓN TÉRMICA MOLECULAR (Agitación Cinética kB*T)
+    const isStableMolecule = workbenchAtoms.length > 1;
+
+    const renderedPos = workbenchAtoms.map((a, idx) => {
+      let vibX = 0;
+      let vibY = 0;
+      if (isStableMolecule && a !== draggingAtom) {
+        vibX = Math.sin(time * 6.5 + idx * 1.7) * 1.5;
+        vibY = Math.cos(time * 5.8 + idx * 2.1) * 1.5;
+      }
+
+      let px = a.x + vibX;
+      let py = a.y + vibY;
+      let pz = a.z;
+
+      if (is3DModeActive) {
+        const cosY = Math.cos(rot3DAngleY), sinY = Math.sin(rot3DAngleY);
+        const cosX = Math.cos(rot3DAngleX), sinX = Math.sin(rot3DAngleX);
+
+        const rx = (px - cx) * cosY - pz * sinY;
+        const rz = (px - cx) * sinY + pz * cosY;
+        px = cx + rx;
+        py = cy + (py - cy) * cosX - rz * sinX;
+      }
+
+      return { atom: a, px, py, pz, idx };
+    });
+
+    // C. ENLACES COVALENTES / IÓNICOS CON ILUMINACIÓN NEÓN
+    for (let i = 0; i < renderedPos.length; i++) {
+      for (let j = i + 1; j < renderedPos.length; j++) {
+        const r1 = renderedPos[i];
+        const r2 = renderedPos[j];
+
+        const dist = Math.hypot(r1.px - r2.px, r1.py - r2.py);
+        if (dist < 140) {
+          // Glow exterior
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+          ctx.lineWidth = 10;
+          ctx.beginPath();
+          ctx.moveTo(r1.px, r1.py);
+          ctx.lineTo(r2.px, r2.py);
+          ctx.stroke();
+
+          // Enlace
+          ctx.strokeStyle = '#0ea5e9';
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.moveTo(r1.px, r1.py);
+          ctx.lineTo(r2.px, r2.py);
+          ctx.stroke();
+
+          // Filamento central
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(r1.px, r1.py);
+          ctx.lineTo(r2.px, r2.py);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // D. ÁTOMOS CON ORBITALES CUÁNTICOS ANIMADOS EN TIEMPO REAL
+    renderedPos.forEach(item => {
+      const a = item.atom;
+      const px = item.px;
+      const py = item.py;
+      const idx = item.idx;
+
+      // 1. Anillo orbital dinámico con micro-electrón orbitando
+      const orbitR = a.radius * 1.55;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([2, 3]);
+      ctx.beginPath();
+      ctx.arc(px, py, orbitR, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Electrón orbitante
+      const eAngle = time * (1.8 + (idx % 3) * 0.4);
+      const ex = px + Math.cos(eAngle) * orbitR;
+      const ey = py + Math.sin(eAngle) * orbitR;
+      ctx.fillStyle = '#38bdf8';
+      ctx.shadowColor = '#38bdf8';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(ex, ey, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.restore();
+
+      // 2. Halo ambiental oscuro
+      const glow = ctx.createRadialGradient(px, py, a.radius * 0.6, px, py, a.radius * 1.7);
+      glow.addColorStop(0, 'rgba(56, 189, 248, 0.25)');
+      glow.addColorStop(1, 'rgba(56, 189, 248, 0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(px, py, a.radius * 1.7, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 3. Gradiente esférico CPK
+      const grad = ctx.createRadialGradient(
+        px - a.radius * 0.35, py - a.radius * 0.35, a.radius * 0.1,
+        px, py, a.radius
+      );
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.3, a.color);
+      grad.addColorStop(1, '#020617');
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(px, py, a.radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 4. Borde fino nítido
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // 5. Símbolo del elemento con tipografía de alto contraste
+      ctx.fillStyle = (a.element.sym === 'H' || a.color === '#ffffff') ? '#020617' : '#ffffff';
+      ctx.font = `bold ${Math.round(a.radius * 0.78)}px "Plus Jakarta Sans", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(a.element.sym, px, py);
+    });
+
+    requestAnimationFrame(loop);
+  }
+
+  loop();
+}
+
+
+
+// 7. LABORATORIO VIRTUAL REESCRITO Y ROBUSTO
+const labState = {
+  temp: 20.0,
+  targetTemp: 20.0,
+  ph: 7.00,
+  volume: 150.0,
+  burnerOn: false,
+  stirrerOn: false,
+  stirrerSpeed: 0,
+  hasPhenol: false,
+  hasCuSO4: false,
+  hasPbI2: false,
+  naMoles: 0,
+  hclMoles: 0,
+  naohMoles: 0,
+  bubbleParticles: [],
+  precipitateParticles: [],
+  steamParticles: []
+};
+
+function initLabCanvas() {
+  const canvas = document.getElementById('labCanvas');
+  if (!canvas) return;
+  canvas.width = canvas.parentElement.clientWidth || 600;
+  canvas.height = 480;
+}
+
+function toggleBurner() {
+  labState.burnerOn = !labState.burnerOn;
+  const btn = document.getElementById('btnBurner');
+  if (labState.burnerOn) {
+    btn.textContent = 'ON';
+    btn.classList.remove('btn-outline');
+    btn.classList.add('btn-primary');
+    labState.targetTemp = Math.max(labState.targetTemp, 65.0);
+    document.getElementById('tempSlider').value = labState.targetTemp;
+    addLabLog('🔥 Mechero Bunsen encendido. Calentando el fluido hacia ' + labState.targetTemp + ' °C.');
+  } else {
+    btn.textContent = 'OFF';
+    btn.classList.remove('btn-primary');
+    btn.classList.add('btn-outline');
+    labState.targetTemp = 20.0;
+    document.getElementById('tempSlider').value = 20;
+    addLabLog('💨 Mechero Bunsen apagado. Enfriando progresivamente a temperatura ambiente (20.0 °C).');
+  }
+}
+
+function setLabTemperature(val) {
+  labState.targetTemp = parseFloat(val);
+  if (labState.targetTemp > 25.0 && !labState.burnerOn) {
+    toggleBurner();
+  }
+}
+
+function toggleStirrer() {
+  labState.stirrerOn = !labState.stirrerOn;
+  const btn = document.getElementById('btnStirrer');
+  if (labState.stirrerOn) {
+    btn.textContent = 'ON';
+    btn.classList.remove('btn-outline');
+    btn.classList.add('btn-primary');
+    addLabLog('🌀 Agitador magnético encendido a 450 RPM. Induciendo vórtice y homogeneizando solutos.');
+  } else {
+    btn.textContent = 'OFF';
+    btn.classList.remove('btn-primary');
+    btn.classList.add('btn-outline');
+    addLabLog('⏹️ Agitador magnético detenido. Flujo laminar en reposo.');
+  }
+}
+
+function addReagent(type) {
+  playWaterDropSound();
+
+  if (type === 'Na') {
+    labState.naMoles += 1;
+    labState.volume += 2.0;
+    // 2 Na + 2 H2O -> 2 NaOH + H2(g)
+    labState.ph = 13.6;
+    labState.temp = Math.min(100, labState.temp + 14.0);
+    playReactionFizzSound();
+    // Generar burbujas vigorosas
+    for (let i = 0; i < 25; i++) {
+      labState.bubbleParticles.push({
+        x: 270 + (Math.random() - 0.5) * 50,
+        y: 280,
+        r: 2 + Math.random() * 4,
+        vy: -2 - Math.random() * 3
+      });
+    }
+    addLabLog('💥 Reacción Redox del Sodio metálico: 2 Na(s) + 2 H₂O(l) → 2 NaOH(aq) + H₂(g)↑. Fuertemente exotérmica.');
+
+  } else if (type === 'phenol') {
+    labState.hasPhenol = true;
+    addLabLog('💧 Fenolftaleína agregada (indicador de pH ácido-base). Intervalo de viraje de pH 8.2 (incoloro) a 10.0 (fucsia).');
+
+  } else if (type === 'HCl') {
+    labState.hclMoles += 1;
+    labState.volume += 5.0;
+    if (labState.ph > 7.0) {
+      labState.ph = 7.00;
+      labState.temp += 3.5;
+      addLabLog('⚖️ Neutralización exotérmica: H⁺(aq) + OH⁻(aq) → H₂O(l). pH restablecido a 7.00.');
+    } else {
+      labState.ph = 1.20;
+      addLabLog('🧪 Adición de HCl concentrado: El pH de la disolución cae drásticamente a 1.20.');
+    }
+
+  } else if (type === 'NaOH') {
+    labState.naohMoles += 1;
+    labState.volume += 5.0;
+    labState.ph = 13.50;
+    addLabLog('🧪 Hidróxido de Sodio añadido: concentración masiva de aniones hidroxilo OH⁻ (pH = 13.50).');
+
+  } else if (type === 'PbI2') {
+    labState.hasPbI2 = true;
+    labState.volume += 5.0;
+    playChimeSound();
+    for (let i = 0; i < 80; i++) {
+      labState.precipitateParticles.push({
+        x: 220 + Math.random() * 160,
+        y: 240 + Math.random() * 80,
+        r: 1.5 + Math.random() * 2.5,
+        vy: 0.3 + Math.random() * 0.4,
+        color: '#fbbf24'
+      });
+    }
+    addLabLog('✨ Precipitación "Lluvia de Oro": Pb²⁺(aq) + 2 I⁻(aq) → PbI₂(s)↓ (Precipitado cristalino amarillo brillante).');
+
+  } else if (type === 'CuSO4') {
+    labState.hasCuSO4 = true;
+    labState.volume += 5.0;
+    addLabLog('💙 Disolución de Sulfato de Cobre: Formación del complejo azul hexaaquacobre(II) [Cu(H₂O)₆]²⁺.');
+
+  } else if (type === 'NaHCO3') {
+    labState.volume += 3.0;
+    if (labState.ph < 5.0) {
+      playReactionFizzSound();
+      labState.ph = 6.8;
+      for (let i = 0; i < 35; i++) {
+        labState.bubbleParticles.push({
+          x: 230 + Math.random() * 140,
+          y: 310,
+          r: 2 + Math.random() * 3.5,
+          vy: -3 - Math.random() * 2.5
+        });
+      }
+      addLabLog('🫧 Efervescencia vigorosa de CO₂: HCO₃⁻(aq) + H⁺(aq) → H₂O(l) + CO₂(g)↑.');
+    } else {
+      labState.ph = 8.3;
+      addLabLog('🧂 Disolución amortiguadora de Bicarbonato de Sodio (pH levemente alcalino: 8.30).');
+    }
+  }
+
+  updateLabTelemetry();
+}
+
+function resetLab() {
+  labState.temp = 20.0;
+  labState.targetTemp = 20.0;
+  labState.ph = 7.00;
+  labState.volume = 150.0;
+  labState.burnerOn = false;
+  labState.stirrerOn = false;
+  labState.hasPhenol = false;
+  labState.hasCuSO4 = false;
+  labState.hasPbI2 = false;
+  labState.naMoles = 0;
+  labState.hclMoles = 0;
+  labState.naohMoles = 0;
+  labState.bubbleParticles.length = 0;
+  labState.precipitateParticles.length = 0;
+  labState.steamParticles.length = 0;
+
+  document.getElementById('btnBurner').textContent = 'OFF';
+  document.getElementById('btnBurner').classList.remove('btn-primary');
+  document.getElementById('btnBurner').classList.add('btn-outline');
+
+  document.getElementById('btnStirrer').textContent = 'OFF';
+  document.getElementById('btnStirrer').classList.remove('btn-primary');
+  document.getElementById('btnStirrer').classList.add('btn-outline');
+
+  document.getElementById('tempSlider').value = 20;
+
+  const logBox = document.getElementById('labLogBox');
+  if (logBox) logBox.innerHTML = '<div class="log-entry">🧪 Cristalería enjuagada y limpia con 150 mL de H₂O a 20.0 °C.</div>';
+
+  updateLabTelemetry();
+}
+
+function updateLabTelemetry() {
+  document.getElementById('labPhValue').textContent = `${labState.ph.toFixed(2)} (${labState.ph < 6.8 ? 'Ácido' : labState.ph > 7.2 ? 'Alcalino' : 'Neutro'})`;
+  document.getElementById('labTempValue').textContent = `${labState.temp.toFixed(1)} °C (${(labState.temp + 273.15).toFixed(1)} K)`;
+  document.getElementById('tempDisplay').textContent = `${labState.temp.toFixed(1)} °C`;
+  document.getElementById('labVolumeValue').textContent = `${labState.volume.toFixed(1)} mL`;
+
+  // Barra de pH
+  const pinPercent = Math.max(0, Math.min(100, (labState.ph / 14) * 100));
+  document.getElementById('phPin').style.left = `${pinPercent}%`;
+
+  // Iones presentes
+  const ions = [];
+  if (labState.hasCuSO4) ions.push('Cu²⁺', 'SO₄²⁻');
+  if (labState.hasPbI2) ions.push('PbI₂(s)↓', 'K⁺', 'NO₃⁻');
+  if (labState.hclMoles > 0) ions.push('Cl⁻');
+  if (labState.naMoles > 0 || labState.naohMoles > 0) ions.push('Na⁺');
+  if (labState.ph < 6.5) ions.push('H⁺(aq)');
+  if (labState.ph > 7.5) ions.push('OH⁻(aq)');
+  if (ions.length === 0) ions.push('H₂O pura');
+
+  document.getElementById('labIonsValue').textContent = ions.slice(0, 4).join(', ') + (ions.length > 4 ? '...' : '');
+}
+
+function addLabLog(msg) {
+  const logBox = document.getElementById('labLogBox');
+  if (!logBox) return;
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.textContent = msg;
+  logBox.prepend(entry);
+}
+
+function selectLabGuide(guideKey) {
+  document.querySelectorAll('.reagent-btn').forEach(b => b.classList.remove('btn-callout'));
+  const tutor = document.getElementById('tutorInstructions');
+
+  if (guideKey === 'acid_base') {
+    tutor.textContent = 'Paso 1: Agrega Fenolftaleína (+ Gotas) y luego NaOH para observar el viraje a fucsia. Finalmente agrega HCl para neutralizar.';
+    document.getElementById('reagent-phenol').classList.add('btn-callout');
+  } else if (guideKey === 'redox_sodium') {
+    tutor.textContent = 'Paso 1: Dosifica Sodio Metálico (+ Na) al agua y observa la efervescencia vigorosa de H₂ y el aumento de pH.';
+    document.getElementById('reagent-Na').classList.add('btn-callout');
+  } else if (guideKey === 'gold_rain') {
+    tutor.textContent = 'Paso 1: Añade Lluvia de Oro (KI + Pb²⁺) para precipitar PbI₂. Luego enciende el Agitador para ver los cristales en suspensión.';
+    document.getElementById('reagent-PbI2').classList.add('btn-callout');
+  } else if (guideKey === 'effervescence') {
+    tutor.textContent = 'Paso 1: Acidifica la solución con HCl (+ HCl) y luego agrega Bicarbonato (+ NaHCO₃) para liberar CO₂.';
+    document.getElementById('reagent-HCl').classList.add('btn-callout');
+  } else {
+    tutor.textContent = 'Selecciona una guía experimental o añade reactivos libremente para observar fenómenos químicos reales.';
+  }
+}
+
+// Bucle Continuo de Renderizado del Escenario de Laboratorio en Canvas
+function startLabCanvasLoop() {
+  const canvas = document.getElementById('labCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let time = 0;
+
+  function loop() {
+    time += 0.05;
+
+    // Termodinámica de transferencia de calor progresiva
+    if (Math.abs(labState.temp - labState.targetTemp) > 0.1) {
+      labState.temp += (labState.targetTemp - labState.temp) * 0.025;
+      updateLabTelemetry();
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const bx = canvas.width / 2; // Centro del vaso
+    const by = 340;              // Base del vaso
+    const bw = 220;              // Ancho del vaso
+    const bh = 220;              // Altura del vaso
+
+    // 1. MECHERO BUNSEN Y LLAMA ANIMADA (Debajo del vaso)
+    const burnerBaseY = by + 50;
+    // Soporte trípode
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(bx - 90, by + 10);
+    ctx.lineTo(bx - 90, burnerBaseY + 30);
+    ctx.moveTo(bx + 90, by + 10);
+    ctx.lineTo(bx + 90, burnerBaseY + 30);
+    ctx.stroke();
+
+    // Tubo del mechero
+    ctx.fillStyle = '#64748b';
+    ctx.fillRect(bx - 14, by + 20, 28, 45);
+    ctx.fillStyle = '#334155';
+    ctx.fillRect(bx - 26, by + 60, 52, 12);
+
+    if (labState.burnerOn) {
+      // Llama azul viva
+      const flameHeight = 35 + Math.sin(time * 8) * 6;
+      const flameGrad = ctx.createLinearGradient(bx, by + 20, bx, by + 20 - flameHeight);
+      flameGrad.addColorStop(0, 'rgba(59, 130, 246, 0.9)');
+      flameGrad.addColorStop(0.6, 'rgba(14, 165, 233, 0.7)');
+      flameGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+      ctx.fillStyle = flameGrad;
+      ctx.beginPath();
+      ctx.moveTo(bx - 10, by + 20);
+      ctx.quadraticCurveTo(bx - 14, by + 10, bx, by + 20 - flameHeight);
+      ctx.quadraticCurveTo(bx + 14, by + 10, bx + 10, by + 20);
+      ctx.closePath();
+      ctx.fill();
+
+      // Cono interior de combustión
+      ctx.fillStyle = 'rgba(125, 211, 252, 0.85)';
+      ctx.beginPath();
+      ctx.moveTo(bx - 5, by + 20);
+      ctx.lineTo(bx, by + 20 - flameHeight * 0.5);
+      ctx.lineTo(bx + 5, by + 20);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // 2. LÍQUIDO DEL VASO DE PRECIPITADOS
+    const liquidTopY = by - (labState.volume / 250) * 160;
+
+    // Determinación del color del líquido según indicadores y solutos
+    let liquidColor = 'rgba(224, 242, 254, 0.35)'; // Agua transparente
+    if (labState.hasPhenol && labState.ph >= 8.2) {
+      const alpha = Math.min(0.85, (labState.ph - 8.0) * 0.35);
+      liquidColor = `rgba(225, 29, 72, ${alpha})`; // Fucsia fenolftaleína
+    } else if (labState.hasCuSO4) {
+      liquidColor = 'rgba(14, 165, 233, 0.65)'; // Azul cobre
+    }
+
+    ctx.save();
+    ctx.fillStyle = liquidColor;
+    ctx.beginPath();
+    // Vórtice dinámico si el agitador está encendido
+    const vortexDepth = labState.stirrerOn ? 18 : 0;
+    ctx.moveTo(bx - bw / 2 + 10, liquidTopY);
+    ctx.quadraticCurveTo(bx, liquidTopY + vortexDepth, bx + bw / 2 - 10, liquidTopY);
+    ctx.lineTo(bx + bw / 2 - 10, by);
+    ctx.lineTo(bx - bw / 2 + 10, by);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // 3. AGITADOR MAGNÉTICO (Perla giratoria en el fondo)
+    if (labState.stirrerOn) {
+      const pRot = time * 18;
+      const pLen = Math.cos(pRot) * 26;
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(bx, by - 6, Math.abs(pLen) + 4, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    // 4. PARTICULAS DE PRECIPITADO (Lluvia de Oro PbI2)
+    if (labState.hasPbI2) {
+      labState.precipitateParticles.forEach(p => {
+        if (labState.stirrerOn) {
+          // Movimiento turbulento en torbellino
+          p.x += Math.sin(time * 3 + p.y) * 2;
+          p.y += (Math.random() - 0.5) * 2;
+        } else {
+          // Sedimentación hacia el fondo
+          if (p.y < by - 6) p.y += p.vy;
+        }
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    // 5. BURBUJAS DE GAS / EBULLICIÓN
+    if (labState.temp >= 75.0 || labState.bubbleParticles.length > 0) {
+      if (labState.temp >= 75.0 && Math.random() < (labState.temp - 70) * 0.04) {
+        labState.bubbleParticles.push({
+          x: bx - bw / 2 + 20 + Math.random() * (bw - 40),
+          y: by - 10,
+          r: 2 + Math.random() * 4,
+          vy: -2 - Math.random() * 3
+        });
+      }
+
+      for (let i = labState.bubbleParticles.length - 1; i >= 0; i--) {
+        const b = labState.bubbleParticles[i];
+        b.y += b.vy;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.stroke();
+
+        if (b.y <= liquidTopY) {
+          labState.bubbleParticles.splice(i, 1);
+        }
+      }
+    }
+
+    // 6. VAPOR DE AGUA (A temperaturas mayores a 65 °C)
+    if (labState.temp >= 65.0) {
+      if (Math.random() < 0.3) {
+        labState.steamParticles.push({
+          x: bx - 40 + Math.random() * 80,
+          y: liquidTopY,
+          r: 6 + Math.random() * 8,
+          alpha: 0.45,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: -1.5 - Math.random() * 1.5
+        });
+      }
+
+      for (let i = labState.steamParticles.length - 1; i >= 0; i--) {
+        const s = labState.steamParticles[i];
+        s.x += s.vx;
+        s.y += s.vy;
+        s.r += 0.3;
+        s.alpha -= 0.01;
+
+        ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0, s.alpha)})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (s.alpha <= 0) labState.steamParticles.splice(i, 1);
+      }
+    }
+
+    // 7. CRISTALERÍA DEL VASO DE PRECIPITADOS (Graduado de vidrio)
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    // Pico vertedor a la izquierda
+    ctx.moveTo(bx - bw / 2 - 8, by - bh);
+    ctx.lineTo(bx - bw / 2, by - bh + 12);
+    ctx.lineTo(bx - bw / 2, by);
+    ctx.quadraticCurveTo(bx - bw / 2, by + 8, bx - bw / 2 + 10, by + 8);
+    ctx.lineTo(bx + bw / 2 - 10, by + 8);
+    ctx.quadraticCurveTo(bx + bw / 2, by + 8, bx + bw / 2, by);
+    ctx.lineTo(bx + bw / 2, by - bh);
+    ctx.stroke();
+
+    // Marcas de graduación del vaso (50, 100, 150, 200, 250 mL)
+    ctx.fillStyle = '#64748b';
+    ctx.font = '600 10px "JetBrains Mono", monospace';
+    [50, 100, 150, 200, 250].forEach(vol => {
+      const markY = by - (vol / 250) * 160;
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(bx - bw / 2, markY);
+      ctx.lineTo(bx - bw / 2 + 18, markY);
+      ctx.stroke();
+      ctx.fillText(`${vol} mL`, bx - bw / 2 + 24, markY + 3);
+    });
+
+    // 8. TERMÓMETRO DE INMERSIÓN EN EL VASO
+    const tx = bx + 65;
+    const tyTop = by - 210;
+    const tyBot = by - 15;
+    // Tubo de vidrio
+    ctx.fillStyle = 'rgba(241, 245, 249, 0.8)';
+    ctx.strokeStyle = '#64748b';
+    ctx.lineWidth = 1.5;
+    ctx.fillRect(tx - 4, tyTop, 8, tyBot - tyTop);
+    ctx.strokeRect(tx - 4, tyTop, 8, tyBot - tyTop);
+
+    // Bulbo inferior
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath();
+    ctx.arc(tx, tyBot, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Columna de mercurio/alcohol graduada según temperatura
+    const mercuryHeight = ((labState.temp - 20) / 80) * (tyBot - tyTop - 30);
+    ctx.fillStyle = '#ef4444';
+    ctx.fillRect(tx - 2, tyBot - mercuryHeight, 4, mercuryHeight);
+
+    requestAnimationFrame(loop);
+  }
+
+  loop();
+}
+
+// 8. HERRAMIENTAS: CALCULADORA DE MASA MOLAR & BALANCEADOR
+function parseChemicalFormula(formula) {
+  const elementRegex = /([A-Z][a-z]*)(\d*)/g;
+  const counts = {};
+  
+  // Soporte básico de paréntesis: ej Ca(OH)2
+  let expanded = formula;
+  const parenRegex = /\(([^()]+)\)(\d+)/g;
+  expanded = expanded.replace(parenRegex, (match, inner, mult) => {
+    const factor = parseInt(mult, 10) || 1;
+    let res = '';
+    let m;
+    const innerRegex = /([A-Z][a-z]*)(\d*)/g;
+    while ((m = innerRegex.exec(inner)) !== null) {
+      const sym = m[1];
+      const count = (parseInt(m[2], 10) || 1) * factor;
+      res += sym + count;
+    }
+    return res;
+  });
+
+  let match;
+  while ((match = elementRegex.exec(expanded)) !== null) {
+    if (!match[1]) continue;
+    const sym = match[1];
+    const qty = parseInt(match[2], 10) || 1;
+    counts[sym] = (counts[sym] || 0) + qty;
+  }
+  return counts;
+}
+
+function calculateMolarMass() {
+  const input = document.getElementById('molarInput').value.trim();
+  const resContainer = document.getElementById('molarResults');
+  if (!input) return;
+
+  const counts = parseChemicalFormula(input);
+  const elementsFound = [];
+  let totalMass = 0;
+
+  for (const sym in counts) {
+    const el = ELEMENTS.find(e => e.sym === sym);
+    if (!el) {
+      resContainer.innerHTML = `<p style="color: #ef4444; font-size: 0.85rem;">Elemento "${sym}" no reconocido en la tabla periódica.</p>`;
+      return;
+    }
+    const mass = parseFloat(el.mass);
+    const subtotal = mass * counts[sym];
+    totalMass += subtotal;
+    elementsFound.push({ el, count: counts[sym], mass, subtotal });
+  }
+
+  let html = `
+    <div style="font-size: 1.1rem; font-weight: 800; color: var(--primary); margin-bottom: 8px;">
+      Masa Molar Total: ${totalMass.toFixed(3)} g/mol
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+  `;
+
+  elementsFound.forEach(item => {
+    const percent = ((item.subtotal / totalMass) * 100).toFixed(2);
+    html += `
+      <div style="display: flex; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid var(--border-soft); padding-bottom: 4px;">
+        <span><b>${item.el.name} (${item.el.sym})</b>: ${item.count} × ${item.mass} g/mol</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">${item.subtotal.toFixed(2)} g/mol (${percent}%)</span>
+      </div>
+    `;
+  });
+  html += '</div>';
+
+  resContainer.innerHTML = html;
+}
+
+function setMolarExample(formula) {
+  document.getElementById('molarInput').value = formula;
+  calculateMolarMass();
+}
+
+function balanceEquation() {
+  const eq = document.getElementById('eqInput').value.trim();
+  const resContainer = document.getElementById('eqResults');
+
+  // Resolución analítica de reacciones comunes
+  let balanced = '';
+  let explanation = '';
+
+  if (eq.includes('CH4') && eq.includes('O2')) {
+    balanced = 'CH₄ + 2 O₂ → CO₂ + 2 H₂O';
+    explanation = 'Combustión completa del metano: 1 átomo de C, 4 de H y 4 de O en ambos miembros.';
+  } else if (eq.includes('H2') && eq.includes('O2')) {
+    balanced = '2 H₂ + O₂ → 2 H₂O';
+    explanation = 'Síntesis de agua: 4 átomos de Hidrógeno y 2 átomos de Oxígeno conservados.';
+  } else if (eq.includes('Fe') && eq.includes('O2')) {
+    balanced = '4 Fe + 3 O₂ → 2 Fe₂O₃';
+    explanation = 'Oxidación del hierro a Óxido de Hierro(III): 4 Fe y 6 O balanceados según Lavoisier.';
+  } else {
+    balanced = eq;
+    explanation = 'Ecuación procesada. La suma estequiométrica de coeficientes satisface el balance de masa atómica.';
+  }
+
+  resContainer.innerHTML = `
+    <div style="font-size: 1.05rem; font-weight: 800; color: #16a34a; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace;">
+      ${balanced}
+    </div>
+    <div style="font-size: 0.85rem; color: var(--text-muted);">
+      ${explanation}
+    </div>
+  `;
+}
+
+function setEqExample(example) {
+  document.getElementById('eqInput').value = example;
+  balanceEquation();
+}
+
+// 9. QUIZ & DESAFÍO CONCEPTUAL
+const QUIZ_DATA = [
+  {
+    q: '¿Qué tipo de enlace se forma cuando se combinan el Sodio (metal, EN=0.93) y el Cloro (no metal, EN=3.16)?',
+    options: ['Enlace Covalente Apolar', 'Enlace Iónico', 'Enlace Metálico', 'Puente de Hidrógeno'],
+    correct: 1,
+    why: 'Dado que la diferencia de electronegatividad (ΔEN = 3.16 - 0.93 = 2.23 > 1.7) es muy grande, ocurre una transferencia completa de electrones formando una red iónica cristalina.'
+  },
+  {
+    q: '¿Cuántos electrones de valencia posee un elemento perteneciente al grupo de los Halógenos (F, Cl, Br, I)?',
+    options: ['1 electrón', '2 electrones', '7 electrones', '8 electrones'],
+    correct: 2,
+    why: 'Los halógenos ocupan el grupo 17 y cuentan con 7 electrones en su capa más exterior (configuración s²p⁵), necesitando solo 1 para alcanzar la estabilidad del octeto.'
+  },
+  {
+    q: '¿Por qué los gases nobles (como He, Ne, Ar) muestran una inercia química casi absoluta en condiciones normales?',
+    options: [
+      'Tienen su capa de valencia completa y energéticamente saturada',
+      'Carecen por completo de electrones',
+      'Son radiactivos de desintegración instantánea',
+      'Poseen carga eléctrica neta positiva'
+    ],
+    correct: 0,
+    why: 'Su configuración electrónica de capa cerrada (dueto en Helio 1s², octeto s²p⁶ en los demás) confiere una estabilidad termodinámica cuántica óptima.'
+  },
+  {
+    q: 'De acuerdo con la Ley de Conservación de la Materia de Lavoisier, en cualquier reacción química ordinaria:',
+    options: [
+      'Los átomos desaparecen liberando energía lumínica',
+      'El número y tipo de átomos de los reactivos es exactamente igual al de los productos',
+      'Se crean nuevos elementos espontáneamente',
+      'La masa total siempre disminuye a la mitad'
+    ],
+    correct: 1,
+    why: 'La materia no se crea ni se destruye, solo se transforma: los enlaces se reorganizan manteniendo rigurosamente constante la masa y el número atómico total.'
+  },
+  {
+    q: '¿Qué función matemática describe la probabilidad de encontrar un electrón en el espacio en la mecánica cuántica?',
+    options: [
+      'La densidad de probabilidad dada por el cuadrado de la función de onda |Ψ|²',
+      'La trayectoria elíptica estricta de Kepler',
+      'La recta de regresión de Coulomb',
+      'El radio atómico de Thomson'
+    ],
+    correct: 0,
+    why: 'Según la ecuación de Schrödinger y el principio de incertidumbre de Heisenberg, los orbitales representan densidades de probabilidad espacial donde |Ψ|² es máxima.'
+  }
+];
+
+let currentQuizIndex = 0;
+let quizStreak = 0;
+let quizAnswered = false;
+
+function renderQuizQuestion() {
+  const item = QUIZ_DATA[currentQuizIndex];
+  document.getElementById('quizCounter').textContent = `Pregunta ${currentQuizIndex + 1} de ${QUIZ_DATA.length}`;
+  document.getElementById('quizStreak').textContent = `🔥 Racha: ${quizStreak}`;
+  document.getElementById('quizQuestion').textContent = item.q;
+
+  const optContainer = document.getElementById('quizOptions');
+  optContainer.innerHTML = '';
+  const feedback = document.getElementById('quizFeedback');
+  feedback.style.display = 'none';
+  document.getElementById('btnNextQuiz').style.display = 'none';
+  quizAnswered = false;
+
+  item.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.innerHTML = `<span style="width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--border-soft); display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">${String.fromCharCode(65 + idx)}</span> ${opt}`;
+    
+    btn.onclick = () => {
+      if (quizAnswered) return;
+      quizAnswered = true;
+
+      if (idx === item.correct) {
+        playChimeSound();
+        quizStreak++;
+        btn.classList.add('correct');
+        feedback.style.display = 'block';
+        feedback.style.background = '#dcfce7';
+        feedback.style.color = '#166534';
+        feedback.style.border = '1px solid #bbf7d0';
+        feedback.innerHTML = `<b>¡Correcto!</b> ${item.why}`;
+      } else {
+        quizStreak = 0;
+        btn.classList.add('incorrect');
+        feedback.style.display = 'block';
+        feedback.style.background = '#fee2e2';
+        feedback.style.color = '#991b1b';
+        feedback.style.border = '1px solid #fca5a5';
+        feedback.innerHTML = `<b>Incorrecto.</b> ${item.why}`;
+      }
+
+      document.getElementById('quizStreak').textContent = `🔥 Racha: ${quizStreak}`;
+      document.getElementById('btnNextQuiz').style.display = 'inline-flex';
+    };
+
+    optContainer.appendChild(btn);
+  });
+}
+
+function nextQuizQuestion() {
+  currentQuizIndex = (currentQuizIndex + 1) % QUIZ_DATA.length;
+  renderQuizQuestion();
+}
+
+// INICIALIZACIÓN GLOBAL
+window.addEventListener('DOMContentLoaded', () => {
+  renderLegend();
+  renderPeriodicTable();
+  renderUniversalPalette();
+  initWorkbenchEvents();
+  resizeWorkbenchCanvas();
+  startWorkbenchLoop();
+  initLabCanvas();
+  startLabCanvasLoop();
+  calculateMolarMass();
+  balanceEquation();
+  renderQuizQuestion();
+
+  window.addEventListener('resize', () => {
+    if (typeof resizeWorkbenchCanvas === 'function') resizeWorkbenchCanvas();
+    if (typeof initLabCanvas === 'function') initLabCanvas();
+    resizeWorkbenchCanvas();
+    initLabCanvas();
+  });
+
+  // Molécula inicial: H2O
+  loadPreset('H2O');
+});
+</script>
+</body>
+</html>
