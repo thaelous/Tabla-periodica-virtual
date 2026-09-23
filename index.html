@@ -22,8 +22,10 @@
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tabla Periódica Interactiva - por Robert Pacheco</title>
-  <meta name="description" content="Plataforma educativa moderna: Tabla periódica interactiva, simulador cuántico vs Bohr, constructor universal de moléculas con física 3D y laboratorio virtual químico interactivo.">
+  <title>Tabla Periódica Interactiva</title>
+  <meta name="description" content="Tabla periódica interactiva por Robert Pacheco con constructor de moléculas 3D, autómata cuántico de diagramas MO, auditor cuántico de Aufbau/Pauli/Hund, herramientas y quiz.">
+  <meta property="og:title" content="Tabla Periódica Interactiva">
+  <meta property="og:description" content="Tabla periódica interactiva por Robert Pacheco con constructor de moléculas 3D, autómata cuántico de diagramas MO, auditor cuántico de Aufbau/Pauli/Hund, herramientas y quiz.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -64,6 +66,11 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    p, span, div, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .card, .badge, .stat-card {
+      overflow-wrap: break-word;
+      word-break: break-word;
+      max-width: 100%;
+    }
 
     body {
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -872,39 +879,51 @@
     #workbenchCanvas:active {
       cursor: grabbing;
     }
+    /* CONSTRUCTOR MOLECULAR: BARRA DE PRESETS RESPONSIVA (GRID/FLEX WRAP ADAPTATIVO) */
     .workbench-presets-bar {
       display: flex;
-      align-items: center;
+      flex-direction: column;
       gap: 10px;
-      padding: 10px 18px;
+      padding: 12px 16px;
       background: #0d1322;
       border-top: 1px solid var(--border-soft);
-      overflow-x: auto;
-      scrollbar-width: thin;
+      box-sizing: border-box;
+      width: 100%;
     }
     .workbench-presets-label {
       font-size: 0.76rem;
       font-weight: 700;
       color: var(--text-muted);
-      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .workbench-presets-scroll {
       display: flex;
-      align-items: center;
+      flex-wrap: wrap;
+      align-items: stretch;
       gap: 8px;
+      width: 100%;
+      box-sizing: border-box;
     }
     .preset-btn {
       display: inline-flex;
       flex-direction: column;
       align-items: flex-start;
-      padding: 5px 12px;
-      border-radius: 8px;
+      justify-content: center;
+      padding: 7px 12px;
+      border-radius: 9px;
       background: var(--bg-card);
       border: 1px solid var(--border-soft);
       color: #f8fafc;
       cursor: pointer;
       transition: all 0.15s ease;
-      white-space: nowrap;
+      flex: 1 1 calc(25% - 8px);
+      min-width: 125px;
+      max-width: 100%;
+      box-sizing: border-box;
     }
     .preset-btn:hover {
       border-color: #38bdf8;
@@ -914,12 +933,109 @@
     .preset-sym {
       font-family: 'JetBrains Mono', monospace;
       font-weight: 800;
-      font-size: 0.84rem;
+      font-size: 0.88rem;
       color: #38bdf8;
+      line-height: 1.2;
     }
     .preset-sub {
-      font-size: 0.68rem;
+      font-size: 0.7rem;
       color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.3;
+      white-space: normal;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      text-align: left;
+    }
+
+    /* CAJA FLOTANTE DE ALERTA Y NOTIFICACIONES QUÍMICAS (FLEXIBLE Y SIN DESBORDAMIENTOS) */
+    .workbench-alert-overlay {
+      position: absolute;
+      top: 56px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 30;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .workbench-alert-box {
+      width: 100%;
+      max-width: 520px;
+      box-sizing: border-box;
+      padding: 12px 16px;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1.5px solid #38bdf8;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.4), 0 8px 24px rgba(0, 0, 0, 0.7);
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      pointer-events: auto;
+      animation: alertSlideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes alertSlideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .workbench-alert-box.alert-explosion {
+      border-color: #ef4444;
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.5), 0 8px 24px rgba(0, 0, 0, 0.8);
+    }
+    .workbench-alert-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .workbench-alert-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #38bdf8;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+    }
+    .workbench-alert-box.alert-explosion .workbench-alert-title {
+      color: #fca5a5;
+    }
+    .workbench-alert-close {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      font-size: 0.85rem;
+      cursor: pointer;
+      padding: 3px 8px;
+      border-radius: 6px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+    .workbench-alert-close:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.2);
+      border-color: #38bdf8;
+    }
+    .workbench-alert-reason {
+      font-size: 0.8rem;
+      color: #e2e8f0;
+      line-height: 1.45;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      margin: 0;
     }
     .feasibility-card-header {
       display: flex;
@@ -952,167 +1068,385 @@
       background: rgba(239, 68, 68, 0.08);
     }
 
-    /* LABORATORIO VIRTUAL REESCRITO */
-    .lab-layout {
-      display: grid;
-      grid-template-columns: 320px 1fr 360px;
-      gap: 20px;
-      align-items: start;
-    }
-
-    @media (max-width: 1200px) {
-      .lab-layout { grid-template-columns: 1fr; }
-    }
-
-    .reagent-rack {
+    /* 3. CONFIGURACIÓN MOLECULAR (AUTÓMATA & AUDITOR CUÁNTICO) */
+    .quantum-wrapper {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 16px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
-
-    .reagent-btn {
+    .quantum-module-nav {
       display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 11px 14px;
-      border-radius: 12px;
-      background: var(--bg-card);
+      gap: 10px;
+      background: #0d1322;
       border: 1px solid var(--border-soft);
-      cursor: pointer;
-      transition: all 0.15s;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--text-main);
-      text-align: left;
+      border-radius: 14px;
+      padding: 6px;
+      box-sizing: border-box;
+      width: 100%;
     }
-
-    .reagent-btn:hover {
-      border-color: var(--border-focus);
-      background: var(--primary-light);
-      transform: translateX(3px);
-    }
-
-    .reagent-btn.btn-callout {
-      animation: calloutPulse 1.5s infinite;
-      border-color: var(--primary);
-    }
-
-    .reagent-badge {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
+    .quantum-module-btn {
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      font-size: 0.82rem;
-      font-family: 'JetBrains Mono', monospace;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: left;
     }
-
-    .lab-stage {
-      position: relative;
-      background: var(--bg-card);
-      border-radius: 16px;
-      border: 1px solid var(--border-soft);
-      overflow: hidden;
+    .quantum-module-btn:hover {
+      color: #f8fafc;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .quantum-module-btn.active {
+      background: #111827;
+      border-color: rgba(56, 189, 248, 0.35);
+      color: #38bdf8;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), 0 0 12px rgba(56, 189, 248, 0.15);
+    }
+    .module-btn-icon {
+      font-size: 1.4rem;
+    }
+    .module-btn-text {
       display: flex;
       flex-direction: column;
-      box-shadow: var(--shadow-sm);
+    }
+    .module-btn-title {
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: -0.01em;
+    }
+    .module-btn-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .quantum-module-btn.active .module-btn-sub {
+      color: #7dd3fc;
     }
 
-    #labCanvas {
+    /* SUBMÓDULO 1: AUTÓMATA CUÁNTICO */
+    .mo-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
       width: 100%;
-      height: 480px;
-      background: radial-gradient(circle at center, #0f172a 0%, #090d16 100%) !important;
-      display: block;
     }
-
-    .lab-controls-bar {
-      padding: 16px;
+    .mo-molecule-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .mo-mol-btn {
+      padding: 6px 14px;
+      border-radius: 8px;
       background: var(--bg-card);
-      border-top: 1px solid var(--border-soft);
+      border: 1px solid var(--border-soft);
+      color: #f8fafc;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .mo-mol-btn:hover {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.1);
+    }
+    .mo-mol-btn.active {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.18);
+      color: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+    }
+    .mo-visuals-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 1024px) {
+      .mo-visuals-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .mo-canvas-card {
+      background: #090d16;
+      border: 1px solid var(--border-soft);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+    }
+    .mo-canvas-card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 8px;
     }
-
-    .temp-control-group {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .stirrer-control-group {
+    .mo-canvas-card-title {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #f8fafc;
       display: flex;
       align-items: center;
       gap: 8px;
     }
+    .mo-canvas-container {
+      width: 100%;
+      height: 380px;
+      position: relative;
+      background: #060911;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .mo-canvas-container canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .mo-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .mo-stat-card {
+      background: #0b1120;
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .mo-stat-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .mo-stat-val {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .mo-stat-desc {
+      font-size: 0.74rem;
+      color: #cbd5e1;
+      line-height: 1.35;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
 
-    .telemetry-row {
+    /* SUBMÓDULO 2: AUDITOR CUÁNTICO */
+    .auditor-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+    .auditor-toolbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 12px;
-      background: var(--bg-subtle);
-      border-radius: 8px;
-      margin-bottom: 8px;
-      font-size: 0.85rem;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: 14px;
+      padding: 12px 16px;
     }
-
-    .telemetry-label {
-      color: var(--text-muted);
-      font-weight: 600;
+    .auditor-element-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
     }
-
-    .telemetry-value {
-      font-family: 'JetBrains Mono', monospace;
+    .auditor-chip {
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      font-size: 0.78rem;
       font-weight: 700;
-      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.15s ease;
     }
-
-    .ph-gradient-bar {
-      height: 8px;
-      border-radius: 4px;
-      background: linear-gradient(to right, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899);
-      position: relative;
-      margin: 8px 0;
+    .auditor-chip:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: #38bdf8;
+      color: #38bdf8;
     }
-
-    .ph-indicator-pin {
-      position: absolute;
-      top: -4px;
-      width: 4px;
-      height: 16px;
-      background: #0f172a;
-      border-radius: 2px;
-      transform: translateX(-50%);
-      transition: left 0.3s ease;
+    .auditor-chip.active {
+      background: #38bdf8;
+      color: #090d16;
+      border-color: #38bdf8;
+      font-weight: 800;
     }
-
-    .log-box {
-      max-height: 280px;
-      overflow-y: auto;
-      font-size: 0.8rem;
+    .orbital-levels-container {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      padding: 12px;
-      background: var(--bg-subtle);
-      border-radius: 8px;
+      gap: 14px;
+      background: #090d16;
       border: 1px solid var(--border-soft);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .orbital-level-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .orbital-level-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .orbital-subshell-label {
+      min-width: 52px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #38bdf8;
       font-family: 'JetBrains Mono', monospace;
     }
-
-    .log-entry {
-      padding: 6px 8px;
-      border-radius: 6px;
-      background: var(--bg-card);
-      border-left: 3px solid var(--primary);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    .orbital-boxes-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
-
+    .orbital-box {
+      width: 54px;
+      height: 62px;
+      border-radius: 8px;
+      background: #0b1120;
+      border: 1.5px solid var(--border-soft);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+      position: relative;
+    }
+    .orbital-box:hover {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.08);
+      transform: translateY(-2px);
+    }
+    .orbital-box.occupied-1 {
+      border-color: rgba(56, 189, 248, 0.7);
+      background: rgba(56, 189, 248, 0.12);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+    }
+    .orbital-box.occupied-2 {
+      border-color: rgba(52, 211, 153, 0.7);
+      background: rgba(52, 211, 153, 0.12);
+      box-shadow: 0 0 10px rgba(52, 211, 153, 0.2);
+    }
+    .orbital-box.violation {
+      border-color: #ef4444 !important;
+      background: rgba(239, 68, 68, 0.15) !important;
+    }
+    .orbital-box-spins {
+      font-size: 1.3rem;
+      font-weight: 800;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: #38bdf8;
+      line-height: 1;
+    }
+    .orbital-box-ml {
+      font-size: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-dim);
+    }
+    .auditor-report-card {
+      background: #0b1120;
+      border: 1.5px solid var(--border-soft);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .auditor-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.84rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      width: fit-content;
+    }
+    .status-basal {
+      background: rgba(52, 211, 153, 0.15);
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      color: #34d399;
+    }
+    .status-excited {
+      background: rgba(251, 191, 36, 0.15);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      color: #fbbf24;
+    }
+    .status-violation {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #f87171;
+    }
+    .quantum-numbers-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    @media (max-width: 640px) {
+      .quantum-numbers-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .qn-card {
+      background: #090d16;
+      border: 1px solid var(--border-soft);
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center;
+    }
+    .qn-symbol {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+    .qn-val {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace;
+    }
     /* HERRAMIENTAS & CALCULADORAS */
     .tools-grid {
       display: grid;
@@ -1796,7 +2130,29 @@
       color: #38bdf8;
     }
 
-    /* Reglas en pantallas móviles */
+    /* ========================================================= */
+    /* AUDITORÍA Y CORRECCIÓN TOTAL EN MODO TELÉFONO (RESPONSIVE) */
+    /* ========================================================= */
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+      position: relative;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    main {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+
+    .tab-content {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
     @media (max-width: 1024px) {
       .mobile-menu-btn {
         display: inline-flex !important;
@@ -1810,30 +2166,254 @@
         justify-content: space-between !important;
         align-items: center !important;
       }
+      main {
+        padding: 14px 10px !important;
+      }
 
-      /* CONSTRUCTOR DE MOLÉCULAS EN MÓVIL: MÁXIMA ALTURA VISUAL AL CANVAS */
+      /* CONSTRUCTOR DE MOLÉCULAS EN TABLET/MÓVIL */
       .builder-layout {
         display: flex !important;
         flex-direction: column !important;
         gap: 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
       }
       #builderPaletteCard, .builder-palette-card {
         order: 1 !important;
-        padding: 10px 14px !important;
+        padding: 12px 14px !important;
       }
       #builderWorkbenchContainer, .workbench-container {
         order: 2 !important;
         margin-top: 0 !important;
+        width: 100% !important;
       }
       #builderFeasibilityCard, .builder-feasibility-card {
         order: 3 !important;
         padding: 14px !important;
+        width: 100% !important;
       }
       #workbenchCanvas {
-        height: 390px !important;
+        height: 380px !important;
+      }
+      .workbench-presets-bar {
+        padding: 10px 12px !important;
+      }
+      .preset-btn {
+        flex: 1 1 calc(33.333% - 8px) !important;
+        min-width: 110px !important;
+        padding: 6px 10px !important;
+      }
+      .workbench-alert-overlay {
+        top: 10px !important;
+        left: 8px !important;
+        right: 8px !important;
+        max-width: calc(100% - 16px) !important;
+      }
+      .workbench-alert-box {
+        padding: 10px 12px !important;
+      }
+      .workbench-alert-title {
+        font-size: 0.84rem !important;
+      }
+      .workbench-alert-reason {
+        font-size: 0.75rem !important;
+      }
+
+      /* CONFIGURACIÓN MOLECULAR */
+      .mo-visuals-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
       }
     }
 
+    @media (max-width: 768px) {
+      .modal-body {
+        grid-template-columns: 1fr !important;
+      }
+      .workbench-presets-bar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+        padding: 10px 10px !important;
+      }
+      .workbench-presets-label {
+        font-size: 0.78rem !important;
+      }
+      .workbench-presets-scroll {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 6px !important;
+        width: 100% !important;
+      }
+      .preset-btn {
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 6px 8px !important;
+      }
+      .feasibility-report-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+      }
+      .feasibility-card-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+      }
+      .tools-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .brand-title {
+        font-size: 1.05rem !important;
+      }
+      .brand-subtitle {
+        font-size: 0.72rem !important;
+      }
+      .quantum-module-nav {
+        flex-direction: column !important;
+        gap: 8px !important;
+        padding: 6px !important;
+      }
+      .quantum-module-btn {
+        width: 100% !important;
+        justify-content: flex-start !important;
+        padding: 10px 12px !important;
+      }
+      .mo-canvas-card-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+      }
+      .mo-canvas-card-header select,
+      .mo-canvas-card-header .btn {
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      .mo-stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+      }
+      #workbenchCanvas {
+        height: 340px !important;
+      }
+      .mo-canvas-container {
+        height: 330px !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-container {
+        padding: 8px 12px !important;
+      }
+      .brand-icon {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 14px !important;
+      }
+      .brand-title {
+        font-size: 0.98rem !important;
+      }
+      .brand-subtitle {
+        font-size: 0.68rem !important;
+      }
+      .mobile-menu-btn {
+        padding: 6px 10px !important;
+        font-size: 0.8rem !important;
+      }
+      .card {
+        padding: 12px 10px !important;
+        border-radius: 12px !important;
+      }
+      #workbenchCanvas {
+        height: 310px !important;
+      }
+      .mo-canvas-container {
+        height: 300px !important;
+      }
+      .workbench-toolbar {
+        padding: 8px 10px !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+      }
+      .workbench-toolbar-left {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important;
+      }
+      .workbench-toolbar-actions {
+        display: flex !important;
+        width: 100% !important;
+        gap: 6px !important;
+      }
+      .workbench-toolbar-actions .btn {
+        flex: 1 !important;
+        justify-content: center !important;
+        padding: 6px 8px !important;
+        font-size: 0.74rem !important;
+      }
+      .workbench-presets-scroll {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 5px !important;
+      }
+      .preset-btn {
+        padding: 5px 6px !important;
+      }
+      .preset-sym {
+        font-size: 0.8rem !important;
+      }
+      .preset-sub {
+        font-size: 0.62rem !important;
+      }
+      .builder-palette-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+      }
+      .builder-search-box {
+        width: 100% !important;
+      }
+      .builder-quick-chips {
+        gap: 4px !important;
+      }
+      .builder-quick-chip {
+        padding: 4px 7px !important;
+        font-size: 0.74rem !important;
+      }
+      .mo-molecule-selector {
+        gap: 5px !important;
+      }
+      .mo-mol-btn {
+        padding: 5px 8px !important;
+        font-size: 0.75rem !important;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .header-container {
+        padding: 6px 8px !important;
+      }
+      .brand-title {
+        font-size: 0.9rem !important;
+      }
+      #workbenchCanvas {
+        height: 270px !important;
+      }
+      .mo-canvas-container {
+        height: 260px !important;
+      }
+      .workbench-presets-scroll {
+        grid-template-columns: 1fr !important;
+      }
+      .modal-dialog {
+        width: 98% !important;
+        margin: 5px auto !important;
+        padding: 10px !important;
+      }
+    }
   </style>
 </head>
 <body class="bg-[#090d16] text-slate-100 min-h-screen antialiased selection:bg-sky-500 selection:text-white" style="background-color: #090d16 !important; color: #f8fafc !important;">
@@ -1864,8 +2444,8 @@
         <button class="nav-tab" data-tab="tab-builder" onclick="switchTab('tab-builder')">
           <span>🧪</span> Constructor de Moléculas
         </button>
-        <button class="nav-tab" data-tab="tab-lab" onclick="switchTab('tab-lab')">
-          <span>🔬</span> Laboratorio Virtual
+        <button class="nav-tab" data-tab="tab-quantum" onclick="switchTab('tab-quantum')">
+          <span>🔬</span> Configuración Molecular
         </button>
         <button class="nav-tab" data-tab="tab-tools" onclick="switchTab('tab-tools')">
           <span>⚖️</span> Herramientas & Cálculos
@@ -1910,11 +2490,11 @@
             <span class="nav-card-arrow">➔</span>
           </button>
 
-          <button class="mobile-nav-card" data-tab="tab-lab" onclick="handleMobileNav('tab-lab')">
+          <button class="mobile-nav-card" data-tab="tab-quantum" onclick="handleMobileNav('tab-quantum')">
             <span class="nav-card-icon">🔬</span>
             <div class="nav-card-body">
-              <span class="nav-card-title">Laboratorio Virtual</span>
-              <span class="nav-card-desc">Vaso con menisco, mechero Bunsen, agitador y Tutor Activo</span>
+              <span class="nav-card-title">Configuración Molecular</span>
+              <span class="nav-card-desc">Autómata Cuántico (Diagramas MO) y Auditor Cuántico (Aufbau, Pauli y Hund)</span>
             </div>
             <span class="nav-card-arrow">➔</span>
           </button>
@@ -2042,11 +2622,22 @@
             </div>
             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
               <button id="btnToggle3D" class="btn btn-primary" onclick="toggle3DAnimation()">
-                <span>🌐</span> Animar en 3D
+                <span>🌐</span> Animar en 3D: Activo
               </button>
               <button class="btn btn-outline" onclick="clearWorkbench()" title="Limpiar lienzo">
                 <span>🗑️</span> Limpiar
               </button>
+            </div>
+          </div>
+
+          <!-- Cuadro Flotante de Alerta y Notificaciones Científicas (100% Flexible, Sin Desbordamiento) -->
+          <div id="workbenchAlertOverlay" class="workbench-alert-overlay" style="display: none;">
+            <div id="workbenchAlertBox" class="workbench-alert-box">
+              <div class="workbench-alert-header">
+                <span id="workbenchAlertTitle" class="workbench-alert-title">⚡ ¡Repulsión Electrostática!</span>
+                <button class="workbench-alert-close" onclick="dismissWorkbenchAlert()" title="Cerrar advertencia" aria-label="Cerrar">✕</button>
+              </div>
+              <p id="workbenchAlertReason" class="workbench-alert-reason"></p>
             </div>
           </div>
 
@@ -2107,154 +2698,221 @@
       </div>
     </section>
 
-    <!-- 3. LABORATORIO VIRTUAL REESCRITO -->
-    <section id="tab-lab" class="tab-content">
-      <div class="lab-layout">
-        <!-- Rack de Reactivos Químicos -->
-        <div class="card">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
-            <h2 style="font-size: 1.1rem; font-weight: 700;">Rack de Reactivos</h2>
-            <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="resetLab()">
-              🧹 Limpiar Vaso
-            </button>
+    <!-- 3. CONFIGURACIÓN MOLECULAR (SUSTITUTO DEL LABORATORIO) -->
+    <section id="tab-quantum" class="tab-content">
+      <div class="quantum-wrapper">
+        <!-- Sub-navegación entre Autómata Cuántico y Auditor Cuántico -->
+        <div class="quantum-module-nav">
+          <button id="subtabBtn-mo" class="quantum-module-btn active" onclick="switchQuantumModule('mo')">
+            <span class="module-btn-icon">🤖</span>
+            <div class="module-btn-text">
+              <span class="module-btn-title">Autómata Cuántico</span>
+              <span class="module-btn-sub">Diagramas MO & Orbitales Moleculares LCAO</span>
+            </div>
+          </button>
+          <button id="subtabBtn-auditor" class="quantum-module-btn" onclick="switchQuantumModule('auditor')">
+            <span class="module-btn-icon">🛡️</span>
+            <div class="module-btn-text">
+              <span class="module-btn-title">Auditor Cuántico</span>
+              <span class="module-btn-sub">Llenado Orbital y Leyes (Aufbau, Pauli, Hund)</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- MÓDULO 1: AUTÓMATA CUÁNTICO (DIAGRAMAS MO & ORBITALES) -->
+        <div id="quantumModule-mo" class="mo-layout">
+          <!-- Selector de Moléculas -->
+          <div class="card" style="padding: 12px 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 8px;">
+              <span style="font-weight: 800; font-size: 0.92rem; color: #f8fafc;">Seleccionar Molécula Diatómica:</span>
+              <span style="font-size: 0.74rem; color: #38bdf8; font-weight: 600;">Teoría de Orbitales Moleculares (LCAO-MO)</span>
+            </div>
+            <div class="mo-molecule-selector" id="moMolSelector">
+              <!-- Botones generados dinámicamente -->
+            </div>
           </div>
-          <div class="reagent-rack">
-            <button class="reagent-btn" id="reagent-Na" onclick="addReagent('Na')">
-              <span class="reagent-badge" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(248, 113, 113, 0.35); color: #fca5a5;">Na</span>
-              <div>
-                <div>Sodio Metálico (Na)</div>
-                <small style="color: var(--text-muted); font-size: 0.7rem;">Reacción Redox vigorosa</small>
-              </div>
-            </button>
 
-            <button class="reagent-btn" id="reagent-phenol" onclick="addReagent('phenol')">
-              <span class="reagent-badge" style="background: rgba(236, 72, 153, 0.2); border: 1px solid rgba(244, 114, 182, 0.35); color: #f472b6;">Ind</span>
-              <div>
-                <div>Fenolftaleína (Gotas)</div>
-                <small style="color: var(--text-muted); font-size: 0.7rem;">Indicador de pH (viraje fucsia)</small>
+          <!-- Cuadrícula Gráfica Dual (Diagrama de Energía + Contorno Cuántico |Ψ|²) -->
+          <div class="mo-visuals-grid">
+            <!-- Diagrama de Niveles de Energía MO -->
+            <div class="mo-canvas-card">
+              <div class="mo-canvas-card-header">
+                <span class="mo-canvas-card-title">
+                  <span>📊</span> Diagrama de Niveles de Energía MO
+                </span>
+                <span id="moMolFormulaBadge" style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 800; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 3px 10px; border-radius: 8px; border: 1px solid rgba(56, 189, 248, 0.3);">H₂</span>
               </div>
-            </button>
+              <div class="mo-canvas-container" id="moEnergyContainer">
+                <canvas id="moEnergyCanvas"></canvas>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: var(--text-muted);">
+                <span>Átomo A (OA)</span>
+                <span style="color: #38bdf8; font-weight: 700;">Orbitales Moleculares (OM)</span>
+                <span>Átomo B (OA)</span>
+              </div>
+            </div>
 
-            <button class="reagent-btn" id="reagent-HCl" onclick="addReagent('HCl')">
-              <span class="reagent-badge" style="background: rgba(234, 179, 8, 0.2); border: 1px solid rgba(250, 204, 21, 0.35); color: #fde047;">HCl</span>
-              <div>
-                <div>Ácido Clorhídrico (HCl)</div>
-                <small style="color: var(--text-muted); font-size: 0.7rem;">Ácido fuerte (aporta H⁺)</small>
+            <!-- Visualizador de Función de Onda |Ψ|² (Contorno y Fases) -->
+            <div class="mo-canvas-card">
+              <div class="mo-canvas-card-header">
+                <span class="mo-canvas-card-title">
+                  <span>🌀</span> Densidad de Probabilidad Cuántica (|Ψ|²)
+                </span>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <select id="moOrbitalSelect" onchange="changeActiveMO()" style="background: #111827; border: 1px solid var(--border-soft); color: #38bdf8; font-size: 0.74rem; font-weight: 700; border-radius: 6px; padding: 3px 8px;">
+                    <!-- Opciones de orbitales dinámicos -->
+                  </select>
+                  <button class="btn btn-outline" style="padding: 3px 8px; font-size: 0.74rem;" onclick="toggleMOPhaseAnim()">
+                    <span id="moAnimIcon">▶️</span> Fase
+                  </button>
+                </div>
               </div>
-            </button>
+              <div class="mo-canvas-container" id="moContourContainer">
+                <canvas id="moContourCanvas"></canvas>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: var(--text-muted);">
+                <span id="moOrbitalNatureBadge" style="color: #34d399; font-weight: 700;">Enlazante (Constructivo)</span>
+                <span id="moNodalPlaneBadge" style="color: #94a3b8;">Planos Nodales: 0</span>
+              </div>
+            </div>
+          </div>
 
-            <button class="reagent-btn" id="reagent-NaOH" onclick="addReagent('NaOH')">
-              <span class="reagent-badge" style="background: rgba(14, 165, 233, 0.2); border: 1px solid rgba(56, 189, 248, 0.35); color: #7dd3fc;">NaOH</span>
-              <div>
-                <div>Hidróxido de Sodio (NaOH)</div>
-                <small style="color: var(--text-muted); font-size: 0.7rem;">Base fuerte (neutralizante)</small>
+          <!-- Reporte Analítico y Factibilidad Termodinámica MO -->
+          <div class="card" style="padding: 16px;">
+            <div style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+              <span style="font-weight: 800; font-size: 1rem; color: #f8fafc;">Diagnóstico Cuántico y Propiedades Macroscópicas</span>
+              <span id="moConfigNotation" style="font-family: 'JetBrains Mono', monospace; font-size: 0.84rem; color: #38bdf8; font-weight: 700;">1σg²</span>
+            </div>
+            <div class="mo-stats-grid">
+              <div class="mo-stat-card">
+                <span class="mo-stat-label">Orden de Enlace (BO)</span>
+                <span class="mo-stat-val" id="moStatBO">1.0</span>
+                <span class="mo-stat-desc" id="moStatBODesc">(Nb - Na) / 2 = (2 - 0) / 2. Enlace simple estable.</span>
               </div>
-            </button>
-
-            <button class="reagent-btn" id="reagent-PbI2" onclick="addReagent('PbI2')">
-              <span class="reagent-badge" style="background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(251, 191, 36, 0.35); color: #fcd34d;">KI+Pb</span>
-              <div>
-                <div>Lluvia de Oro (KI + Pb²⁺)</div>
-                <small style="color: var(--text-muted); font-size: 0.7rem;">Precipitación de PbI₂ dorada</small>
+              <div class="mo-stat-card">
+                <span class="mo-stat-label">Magnetismo Cuántico</span>
+                <span class="mo-stat-val" id="moStatMag">Diamagnético</span>
+                <span class="mo-stat-desc" id="moStatMagDesc">Todos los electrones apareados (μ = 0 μB).</span>
               </div>
-            </button>
-
-            <button class="reagent-btn" id="reagent-CuSO4" onclick="addReagent('CuSO4')">
-              <span class="reagent-badge" style="background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(96, 165, 250, 0.35); color: #93c5fd;">CuSO₄</span>
-              <div>
-                <div>Sulfato de Cobre (CuSO₄)</div>
-                <small style="color: var(--text-muted); font-size: 0.7rem;">Disolución azul de Cu²⁺(aq)</small>
+              <div class="mo-stat-card">
+                <span class="mo-stat-label">Frontera HOMO / LUMO</span>
+                <span class="mo-stat-val" id="moStatHOMO" style="font-size: 0.95rem;">1σg / 1σu*</span>
+                <span class="mo-stat-desc" id="moStatHOMODesc">Brecha cuántica de excitación electrónica.</span>
               </div>
-            </button>
-
-            <button class="reagent-btn" id="reagent-NaHCO3" onclick="addReagent('NaHCO3')">
-              <span class="reagent-badge" style="background: rgba(148, 163, 184, 0.15); border: 1px solid rgba(148, 163, 184, 0.3); color: #cbd5e1;">NaHCO₃</span>
-              <div>
-                <div>Bicarbonato de Sodio</div>
-                <small style="color: var(--text-muted); font-size: 0.7rem;">Efervescencia de gas CO₂</small>
+              <div class="mo-stat-card">
+                <span class="mo-stat-label">Estabilidad Termodinámica</span>
+                <span class="mo-stat-val" id="moStatStab" style="color: #34d399;">Altamente Estable</span>
+                <span class="mo-stat-desc" id="moStatStabDesc">ΔH disociación > 0; molécula con existencia espontánea.</span>
               </div>
-            </button>
+            </div>
           </div>
         </div>
 
-        <!-- Cristalería y Escenario de Laboratorio -->
-        <div class="lab-stage">
-          <canvas id="labCanvas"></canvas>
-
-          <!-- Barra de Controles Físicos (Mechero y Agitador) -->
-          <div class="lab-controls-bar">
-            <!-- Mechero Bunsen -->
-            <div class="temp-control-group">
-              <span style="font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 6px;">
-                <span>🔥</span> Mechero Bunsen:
-              </span>
-              <button id="btnBurner" class="btn btn-outline" onclick="toggleBurner()">
-                OFF
-              </button>
-              <input type="range" id="tempSlider" min="20" max="100" value="20" step="1" oninput="setLabTemperature(this.value)" style="width: 110px; cursor: pointer;">
-              <span id="tempDisplay" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; width: 55px;">20.0 °C</span>
+        <!-- MÓDULO 2: AUDITOR CUÁNTICO (LLENADO ORBITAL Y LEYES) -->
+        <div id="quantumModule-auditor" class="auditor-layout" style="display: none;">
+          <!-- Barra de Control del Auditor y Selección de Elemento -->
+          <div class="auditor-toolbar">
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <span style="font-weight: 800; font-size: 0.92rem; color: #f8fafc;">Elemento a Auditar:</span>
+              <div class="auditor-element-chips" id="auditorChips">
+                <!-- Chips de elementos generados -->
+              </div>
             </div>
-
-            <!-- Agitador Magnético -->
-            <div class="stirrer-control-group">
-              <span style="font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 6px;">
-                <span>🌀</span> Agitador:
-              </span>
-              <button id="btnStirrer" class="btn btn-outline" onclick="toggleStirrer()">
-                OFF
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <button class="btn btn-primary" onclick="autoFillBasalConfig()">
+                <span>⚡</span> Autollenar Basal
+              </button>
+              <button class="btn btn-outline" onclick="randomAuditorChallenge()">
+                <span>🎲</span> Reto Aleatorio
+              </button>
+              <button class="btn btn-outline" onclick="clearAuditorOrbitals()">
+                <span>🧹</span> Limpiar
               </button>
             </div>
           </div>
-        </div>
 
-        <!-- Telemetría & Tutor Guiado -->
-        <div class="card">
-          <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-            <span>📊</span> Telemetría de la Disolución
-          </h2>
-
-          <div class="telemetry-row">
-            <span class="telemetry-label">pH de la Solución:</span>
-            <span class="telemetry-value" id="labPhValue">7.00 (Neutro)</span>
-          </div>
-          <div class="ph-gradient-bar">
-            <div class="ph-indicator-pin" id="phPin" style="left: 50%;"></div>
-          </div>
-
-          <div class="telemetry-row">
-            <span class="telemetry-label">Temperatura:</span>
-            <span class="telemetry-value" id="labTempValue">20.0 °C (293.15 K)</span>
-          </div>
-
-          <div class="telemetry-row">
-            <span class="telemetry-label">Volumen de Solución:</span>
-            <span class="telemetry-value" id="labVolumeValue">150.0 mL</span>
-          </div>
-
-          <div class="telemetry-row">
-            <span class="telemetry-label">Iones y Precipitados:</span>
-            <span class="telemetry-value" id="labIonsValue">H₂O pura</span>
-          </div>
-
-          <!-- Tutor y Bitácora Activa -->
-          <div style="margin-top: 16px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-              <h3 style="font-size: 0.9rem; font-weight: 700;">Bitácora & Tutor Activo</h3>
-              <select id="guideSelector" onchange="selectLabGuide(this.value)" style="padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; border: 1px solid var(--border-soft);">
-                <option value="none">🔬 Experimento Libre</option>
-                <option value="acid_base">Guía 1: Neutralización Ácido-Base</option>
-                <option value="redox_sodium">Guía 2: Redox del Sodio en Agua</option>
-                <option value="gold_rain">Guía 3: Precipitado Lluvia de Oro</option>
-                <option value="effervescence">Guía 4: Efervescencia de CO₂</option>
-              </select>
+          <!-- Contenedor de Niveles y Cajas Orbitales -->
+          <div class="orbital-levels-container">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <span style="font-size: 0.8rem; font-weight: 700; color: #94a3b8;">
+                Haz clic en una caja para asignar electrones con espín cuántico (↑ / ↓):
+              </span>
+              <span id="auditorElectronCounter" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 800; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 3px 10px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.3);">
+                e⁻ Asignados: 0 / 6
+              </span>
             </div>
 
-            <div id="tutorInstructions" style="font-size: 0.8rem; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); padding: 8px 12px; border-radius: 8px; color: #7dd3fc; font-weight: 500; margin-bottom: 8px;">
-              Selecciona una guía experimental o añade reactivos libremente para observar fenómenos químicos reales.
+            <!-- Filas de Subniveles Cuánticos -->
+            <div class="orbital-level-row">
+              <span class="orbital-subshell-label">1s</span>
+              <div class="orbital-boxes-row" id="subshell-1s"></div>
             </div>
 
-            <div class="log-box" id="labLogBox">
-              <div class="log-entry">🧪 Cristalería limpia lista con 150 mL de H₂O a 20.0 °C.</div>
+            <div class="orbital-level-row">
+              <span class="orbital-subshell-label">2s</span>
+              <div class="orbital-boxes-row" id="subshell-2s"></div>
+              <span class="orbital-subshell-label" style="margin-left: 14px;">2p</span>
+              <div class="orbital-boxes-row" id="subshell-2p"></div>
+            </div>
+
+            <div class="orbital-level-row">
+              <span class="orbital-subshell-label">3s</span>
+              <div class="orbital-boxes-row" id="subshell-3s"></div>
+              <span class="orbital-subshell-label" style="margin-left: 14px;">3p</span>
+              <div class="orbital-boxes-row" id="subshell-3p"></div>
+            </div>
+
+            <div class="orbital-level-row">
+              <span class="orbital-subshell-label">4s</span>
+              <div class="orbital-boxes-row" id="subshell-4s"></div>
+              <span class="orbital-subshell-label" style="margin-left: 14px;">3d</span>
+              <div class="orbital-boxes-row" id="subshell-3d"></div>
+            </div>
+          </div>
+
+          <!-- Reporte de Auditoría Cuántica en Vivo -->
+          <div class="auditor-report-card">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span id="auditorStatusBadge" class="auditor-status-badge status-basal">
+                  <span>✅</span> ESTADO BASAL VÁLIDO
+                </span>
+                <span id="auditorSpectroscopicNotation" style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; font-weight: 800; color: #f8fafc;">
+                  1s² 2s² 2p²
+                </span>
+              </div>
+              <span id="auditorGasNobleNotation" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #94a3b8;">
+                [He] 2s² 2p²
+              </span>
+            </div>
+
+            <p id="auditorVerdictText" style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.45; margin: 0; word-wrap: break-word;">
+              Todos los orbitales de menor energía han sido ocupados en estricto orden de Aufbau, sin dobletes paralelos (Pauli) y con máxima multiplicidad en subniveles degenerados (Hund).
+            </p>
+
+            <!-- Desglose de los 4 Números Cuánticos del Electrón Diferenciante -->
+            <div>
+              <span style="font-size: 0.74rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">
+                Números Cuánticos del Electrón Diferenciante (Último e⁻ añadido):
+              </span>
+              <div class="quantum-numbers-grid">
+                <div class="qn-card">
+                  <div class="qn-symbol">n (Principal)</div>
+                  <div class="qn-val" id="qn-n">2</div>
+                </div>
+                <div class="qn-card">
+                  <div class="qn-symbol">l (Azimutal)</div>
+                  <div class="qn-val" id="qn-l">1 (p)</div>
+                </div>
+                <div class="qn-card">
+                  <div class="qn-symbol">ml (Magnético)</div>
+                  <div class="qn-val" id="qn-ml">0</div>
+                </div>
+                <div class="qn-card">
+                  <div class="qn-symbol">ms (Espín)</div>
+                  <div class="qn-val" id="qn-ms">+½</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2665,10 +3323,30 @@ function switchTab(tabId) {
   const activeMobileBtn = document.querySelector(`.mobile-nav-card[data-tab="${tabId}"]`);
   if (activeMobileBtn) activeMobileBtn.classList.add('active');
 
+  // Cancelar procesos en segundo plano de pestañas inactivas para máximo rendimiento
+  if (tabId !== 'tab-builder' && workbenchAnimId) {
+    cancelAnimationFrame(workbenchAnimId);
+    workbenchAnimId = null;
+  }
+  if (tabId !== 'tab-quantum' && moContourAnimId) {
+    cancelAnimationFrame(moContourAnimId);
+    moContourAnimId = null;
+  }
+
   if (tabId === 'tab-builder') {
+    is3DModeActive = true;
+    const btn = document.getElementById("btnToggle3D");
+    if (btn) {
+      btn.classList.remove("btn-outline");
+      btn.classList.add("btn-primary");
+      btn.innerHTML = '<span>🌐</span> Animar en 3D: Activo';
+    }
     setTimeout(resizeWorkbenchCanvas, 30);
-  } else if (tabId === 'tab-lab') {
-    setTimeout(initLabCanvas, 30);
+  } else if (tabId === 'tab-quantum') {
+    setTimeout(() => {
+      renderMODiagram();
+      renderMOContour();
+    }, 30);
   }
 }
 
@@ -3080,7 +3758,9 @@ function startAtomSimulation() {
 
 // 6. CONSTRUCTOR UNIVERSAL DE MOLÉCULAS & MOTOR QUÍMICO RIGUROSO
 const workbenchAtoms = [];
-let is3DModeActive = false;
+let isWorkbenchInViewport = false;
+let workbenchAnimId = null;
+let is3DModeActive = true;
 let rot3DAngleX = 0;
 let rot3DAngleY = 0;
 let draggingAtom = null;
@@ -3093,6 +3773,44 @@ const workbenchSparks = [];
 const workbenchExplosions = [];
 let workbenchFlashAlpha = 0;
 let floatingScientificAlert = null;
+let alertTimerId = null;
+
+function showScientificAlert(title, reason, type = "repulsion", durationMs = 4800) {
+  const overlay = document.getElementById("workbenchAlertOverlay");
+  const box = document.getElementById("workbenchAlertBox");
+  const titleEl = document.getElementById("workbenchAlertTitle");
+  const reasonEl = document.getElementById("workbenchAlertReason");
+  if (overlay && box && titleEl && reasonEl) {
+    titleEl.textContent = title;
+    reasonEl.textContent = reason;
+    if (type === "explosion") {
+      box.classList.add("alert-explosion");
+    } else {
+      box.classList.remove("alert-explosion");
+    }
+    overlay.style.display = "flex";
+    overlay.style.opacity = "1";
+    if (alertTimerId) clearTimeout(alertTimerId);
+    alertTimerId = setTimeout(() => {
+      dismissWorkbenchAlert();
+    }, durationMs);
+  }
+}
+
+function dismissWorkbenchAlert() {
+  const overlay = document.getElementById("workbenchAlertOverlay");
+  if (overlay) {
+    overlay.style.opacity = "0";
+    setTimeout(() => {
+      if (overlay) overlay.style.display = "none";
+    }, 250);
+  }
+  if (alertTimerId) {
+    clearTimeout(alertTimerId);
+    alertTimerId = null;
+  }
+}
+
 const workbenchCooldowns = new Map();
 
 // Elementos frecuentes para chips rápidos de ensamble
@@ -3284,12 +4002,8 @@ function triggerElectrostaticRepulsion(a1, a2, reason) {
 
   playSparkSound();
 
-  floatingScientificAlert = {
-    title: "⚡ ¡Repulsión Electrostática!",
-    reason: reason,
-    type: "repulsion",
-    life: 130
-  };
+  showScientificAlert("⚡ ¡Repulsión Electrostática!", reason, "repulsion", 4800);
+  floatingScientificAlert = null;
 }
 
 // Reacción exotérmica violenta con destello, onda expansiva y fuego
@@ -3351,12 +4065,8 @@ function triggerExothermicReaction(a1, a2, rxnDesc) {
   a2.vx = nx * 8;
   a2.vy = ny * 8;
 
-  floatingScientificAlert = {
-    title: "⚠️ ¡REACCIÓN EXOTÉRMICA VIOLENTA! (ΔH < 0)",
-    reason: rxnDesc || "Síntesis espontánea violenta con masiva liberación de calor entálpico.",
-    type: "explosion",
-    life: 180
-  };
+  showScientificAlert("⚠️ ¡REACCIÓN EXOTÉRMICA VIOLENTA! (ΔH < 0)", rxnDesc || "Síntesis espontánea violenta con masiva liberación de calor entálpico.", "explosion", 5500);
+  floatingScientificAlert = null;
 }
 
 // ----------------------------------------------------
@@ -3614,11 +4324,11 @@ function filterPalette(val) {
 // MOTOR FÍSICO Y GRÁFICO DEL CONSTRUCTOR
 // ----------------------------------------------------
 
-function addAtomToWorkbench(element, x = null, y = null) {
+function addAtomToWorkbench(element, x = null, y = null, z = null) {
   const canvas = document.getElementById("workbenchCanvas");
   const cx = x !== null ? x : (canvas ? canvas.width / 2 + (Math.random() * 80 - 40) : 200);
   const cy = y !== null ? y : (canvas ? canvas.height / 2 + (Math.random() * 80 - 40) : 200);
-
+  const cz = z !== null ? z : (Math.random() - 0.5) * 60;
   let color = "#94a3b8";
   if (element.sym === "H") color = "#ffffff";
   else if (element.sym === "C") color = "#334155";
@@ -3633,14 +4343,13 @@ function addAtomToWorkbench(element, x = null, y = null) {
     element: element,
     x: cx,
     y: cy,
-    z: (Math.random() - 0.5) * 60,
+    z: cz,
     vx: 0,
     vy: 0,
     valenceCapacity: getElementValenceCapacity(element),
     radius: Math.max(16, Math.min(28, 12 + (element.valElectrons || 1) * 2)),
     color: color
   };
-
   workbenchAtoms.push(newAtom);
   updateAtomCounter();
   evaluateFeasibility();
@@ -3656,13 +4365,14 @@ function clearWorkbench() {
   workbenchSparks.length = 0;
   workbenchExplosions.length = 0;
   floatingScientificAlert = null;
+  dismissWorkbenchAlert();
   workbenchFlashAlpha = 0;
-  is3DModeActive = false;
+  is3DModeActive = true;
   const btn = document.getElementById("btnToggle3D");
   if (btn) {
-    btn.classList.remove("btn-primary");
-    btn.classList.add("btn-outline");
-    btn.innerHTML = "<span>🌐</span> Animar en 3D";
+    btn.classList.remove("btn-outline");
+    btn.classList.add("btn-primary");
+    btn.innerHTML = '<span>🌐</span> Animar en 3D: Activo';
   }
   updateAtomCounter();
   evaluateFeasibility();
@@ -3675,11 +4385,11 @@ function toggle3DAnimation() {
     if (is3DModeActive) {
       btn.classList.remove("btn-outline");
       btn.classList.add("btn-primary");
-      btn.innerHTML = "<span>⏸️</span> Pausar 3D";
+      btn.innerHTML = '<span>🌐</span> Animar en 3D: Activo';
     } else {
       btn.classList.remove("btn-primary");
       btn.classList.add("btn-outline");
-      btn.innerHTML = "<span>🌐</span> Animar en 3D";
+      btn.innerHTML = '<span>🌐</span> Animar en 3D: Inactivo';
     }
   }
 }
@@ -4090,6 +4800,18 @@ function initQuantumBackground() {
 initQuantumBackground();
 
 // Bucle Continuo del Motor Químico y Render en Canvas
+function wakeWorkbenchLoop() {
+  const canvas = document.getElementById("workbenchCanvas");
+  if (!canvas) return;
+  const builderTab = document.getElementById("tab-builder");
+  const isTabActive = builderTab && builderTab.classList.contains("active");
+  if (isWorkbenchInViewport && isTabActive && !document.hidden && !workbenchAnimId) {
+    workbenchAnimId = requestAnimationFrame(loopWorkbenchPhysics);
+  }
+}
+
+let loopWorkbenchPhysics = null;
+
 function startWorkbenchLoop() {
   const canvas = document.getElementById("workbenchCanvas");
   if (!canvas) return;
@@ -4097,7 +4819,16 @@ function startWorkbenchLoop() {
   if (!ctx) return;
   let time = 0;
 
-  function loop() {
+  loopWorkbenchPhysics = function() {
+    const builderTab = document.getElementById("tab-builder");
+    const isTabActive = builderTab && builderTab.classList.contains("active");
+    
+    // OPTIMIZACIÓN ENERGÉTICA: Pausar inmediatamente si no está visible en viewport o pestaña inactiva
+    if (!isWorkbenchInViewport || !isTabActive || document.hidden) {
+      workbenchAnimId = null;
+      return;
+    }
+
     // Prevención estricta de pantalla negra
     if (!canvas || !ctx || canvas.width <= 0 || canvas.height <= 0) {
       requestAnimationFrame(loop);
@@ -4474,8 +5205,23 @@ function startWorkbenchLoop() {
 
       ctx.save();
       ctx.globalAlpha = hudAlpha;
-      const hudW = Math.min(canvas.width - 28, 480);
-      const hudH = 58;
+      const hudW = Math.min(canvas.width - 28, 520);
+      const maxTextWidth = hudW - 28;
+      ctx.font = '11px "Plus Jakarta Sans", sans-serif';
+      const words = (floatingScientificAlert.reason || "").split(" ");
+      const wrappedLines = [];
+      let curLine = "";
+      for (const w of words) {
+        const test = curLine ? curLine + " " + w : w;
+        if (ctx.measureText(test).width > maxTextWidth) {
+          if (curLine) wrappedLines.push(curLine);
+          curLine = w;
+        } else {
+          curLine = test;
+        }
+      }
+      if (curLine) wrappedLines.push(curLine);
+      const hudH = Math.max(58, 38 + Math.min(wrappedLines.length, 4) * 16);
       const hudX = (canvas.width - hudW) / 2;
       const hudY = 16;
 
@@ -4499,507 +5245,1692 @@ function startWorkbenchLoop() {
 
       ctx.fillStyle = "#cbd5e1";
       ctx.font = '11px "Plus Jakarta Sans", sans-serif';
-      const maxTextWidth = hudW - 28;
-      let reasonText = floatingScientificAlert.reason;
-      if (ctx.measureText(reasonText).width > maxTextWidth) {
-        reasonText = reasonText.slice(0, 75) + "...";
-      }
-      ctx.fillText(reasonText, hudX + 14, hudY + 30);
+      wrappedLines.slice(0, 4).forEach((line, lineIdx) => {
+        ctx.fillText(line, hudX + 14, hudY + 32 + lineIdx * 16);
+      });
       ctx.restore();
     }
-
-    requestAnimationFrame(loop);
-  }
-
-  loop();
+    workbenchAnimId = requestAnimationFrame(loopWorkbenchPhysics);
+  };
+  wakeWorkbenchLoop();
 }
 
-// 7. LABORATORIO VIRTUAL REESCRITO Y ROBUSTO
-const labState = {
-  temp: 20.0,
-  targetTemp: 20.0,
-  ph: 7.00,
-  volume: 150.0,
-  burnerOn: false,
-  stirrerOn: false,
-  stirrerSpeed: 0,
-  hasPhenol: false,
-  hasCuSO4: false,
-  hasPbI2: false,
-  naMoles: 0,
-  hclMoles: 0,
-  naohMoles: 0,
-  bubbleParticles: [],
-  precipitateParticles: [],
-  steamParticles: []
-};
+// 7. CONFIGURACIÓN MOLECULAR: AUTÓMATA CUÁNTICO & AUDITOR CUÁNTICO
+// =========================================================================
 
-function initLabCanvas() {
-  const canvas = document.getElementById('labCanvas');
+// Variable de submódulo activo ('mo' o 'auditor')
+let activeQuantumSubmodule = 'mo';
+
+function switchQuantumModule(mod) {
+  activeQuantumSubmodule = mod;
+  const btnMo = document.getElementById('subtabBtn-mo');
+  const btnAuditor = document.getElementById('subtabBtn-auditor');
+  const modMo = document.getElementById('quantumModule-mo');
+  const modAuditor = document.getElementById('quantumModule-auditor');
+  if (btnMo) btnMo.classList.toggle('active', mod === 'mo');
+  if (btnAuditor) btnAuditor.classList.toggle('active', mod === 'auditor');
+  if (modMo) modMo.style.display = mod === 'mo' ? 'flex' : 'none';
+  if (modAuditor) modAuditor.style.display = mod === 'auditor' ? 'flex' : 'none';
+  if (mod === 'mo') {
+    setTimeout(() => {
+      renderMODiagram();
+      renderMOContour();
+      wakeMOLoop();
+    }, 30);
+  } else {
+    if (moContourAnimId) {
+      cancelAnimationFrame(moContourAnimId);
+      moContourAnimId = null;
+    }
+  }
+}
+
+// Síntesis sonora de resonancia cuántica mediante Web Audio API
+function playQuantumResonanceSound(freq = 440) {
+  try {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(freq * 1.45, ctx.currentTime + 0.16);
+    gain.gain.setValueAtTime(0.05, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.32);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.32);
+  } catch (e) {}
+}
+
+// -------------------------------------------------------------------------
+// SUBMÓDULO 1: AUTÓMATA CUÁNTICO (TEORÍA LCAO-MO & CINÉTICA DIFERENCIADA)
+// -------------------------------------------------------------------------
+
+const MO_MOLECULES = [
+  {
+    id: "H2",
+    formula: "H₂",
+    name: "Dihidrógeno",
+    atomA: "H (1s¹)",
+    atomB: "H (1s¹)",
+    category: "homonuclear-light",
+    bo: 1.0,
+    mag: "Diamagnético",
+    magDesc: "0 electrones desapareados (μ = 0.00 μB). Capa cerrada perfecta.",
+    homo: "1σg",
+    lumo: "1σu*",
+    notation: "1σg²",
+    stability: "Altamente Estable",
+    stabColor: "#34d399",
+    stabDesc: "Enlace covalente simple ultracompacto de 436 kJ/mol.",
+    freqVib: "4401 cm⁻¹ (Alta vibración)",
+    dipole: "0.00 D (No polar)",
+    deltaEN: 0.0,
+    theme: {
+      primary: "#38bdf8",
+      secondary: "#67e8f9",
+      accent: "#ffffff",
+      glow: "rgba(56, 189, 248, 0.4)",
+      bgGlow: "rgba(14, 165, 233, 0.1)"
+    },
+    levels: [
+      { name: "1σg", type: "bonding", occ: 2, energy: -1.0, nature: "σ enlazante (constructivo)", nodes: 0 },
+      { name: "1σu*", type: "antibonding", occ: 0, energy: 0.8, nature: "σ* antienlazante (destructivo)", nodes: 1 }
+    ]
+  },
+  {
+    id: "He2",
+    formula: "He₂",
+    name: "Dihelio",
+    atomA: "He (1s²)",
+    atomB: "He (1s²)",
+    category: "inert-repulsive",
+    bo: 0.0,
+    mag: "Diamagnético",
+    magDesc: "Electrones pareados, pero sin enlace neto.",
+    homo: "1σu*",
+    lumo: "2σg",
+    notation: "1σg² 1σu*²",
+    stability: "Inestable / No Existe",
+    stabColor: "#ef4444",
+    stabDesc: "BO = 0. La repulsión antienlazante cancela por completo el enlace.",
+    freqVib: "0 cm⁻¹ (Disociado)",
+    dipole: "0.00 D",
+    deltaEN: 0.0,
+    theme: {
+      primary: "#ef4444",
+      secondary: "#f97316",
+      accent: "#fca5a5",
+      glow: "rgba(239, 68, 68, 0.4)",
+      bgGlow: "rgba(239, 68, 68, 0.1)"
+    },
+    levels: [
+      { name: "1σg", type: "bonding", occ: 2, energy: -1.0, nature: "σ enlazante", nodes: 0 },
+      { name: "1σu*", type: "antibonding", occ: 2, energy: 0.8, nature: "σ* antienlazante", nodes: 1 }
+    ]
+  },
+  {
+    id: "Li2",
+    formula: "Li₂",
+    name: "Dilitio",
+    atomA: "Li (2s¹)",
+    atomB: "Li (2s¹)",
+    category: "light-diffuse",
+    bo: 1.0,
+    mag: "Diamagnético",
+    magDesc: "Electrones de valencia apareados en fase gaseosa.",
+    homo: "2σg",
+    lumo: "2σu*",
+    notation: "KK 2σg²",
+    stability: "Estable en Fase Vapor",
+    stabColor: "#34d399",
+    stabDesc: "Enlace simple de baja energía (105 kJ/mol). Nube de valencia 2s gigante y difusa.",
+    freqVib: "351 cm⁻¹ (Baja frecuencia)",
+    dipole: "0.00 D",
+    deltaEN: 0.0,
+    theme: {
+      primary: "#f59e0b",
+      secondary: "#fbbf24",
+      accent: "#ef4444",
+      glow: "rgba(245, 158, 11, 0.4)",
+      bgGlow: "rgba(245, 158, 11, 0.12)"
+    },
+    levels: [
+      { name: "2σg", type: "bonding", occ: 2, energy: -0.8, nature: "σ enlazante difuso", nodes: 0 },
+      { name: "2σu*", type: "antibonding", occ: 0, energy: 0.7, nature: "σ* antienlazante", nodes: 1 }
+    ]
+  },
+  {
+    id: "B2",
+    formula: "B₂",
+    name: "Diboro",
+    atomA: "B (2s² 2p¹)",
+    atomB: "B (2s² 2p¹)",
+    category: "homonuclear-paramag-pi",
+    bo: 1.0,
+    mag: "Paramagnético ⚠️",
+    magDesc: "2 electrones desapareados en orbitales π degenerados (μ = 2.83 μB). Éxito del modelo MO.",
+    homo: "1πu",
+    lumo: "3σg",
+    notation: "KK 2σg² 2σu*² (1πu¹ = 1πu¹)",
+    stability: "Estable",
+    stabColor: "#34d399",
+    stabDesc: "Orden 1. Explicado únicamente por teoría MO.",
+    freqVib: "1051 cm⁻¹",
+    dipole: "0.00 D",
+    deltaEN: 0.0,
+    theme: {
+      primary: "#14b8a6",
+      secondary: "#a855f7",
+      accent: "#2dd4bf",
+      glow: "rgba(20, 184, 166, 0.4)",
+      bgGlow: "rgba(20, 184, 166, 0.1)"
+    },
+    levels: [
+      { name: "2σg", type: "bonding", occ: 2, energy: -1.2, nature: "σ enlazante", nodes: 0 },
+      { name: "2σu*", type: "antibonding", occ: 2, energy: -0.6, nature: "σ* antienlazante", nodes: 1 },
+      { name: "1πu", type: "bonding", occ: 2, energy: 0.2, deg: 2, nature: "π degenerado (1 e⁻ en cada uno)", nodes: 1 },
+      { name: "3σg", type: "bonding", occ: 0, energy: 0.7, nature: "σ enlazante", nodes: 0 },
+      { name: "1πg*", type: "antibonding", occ: 0, energy: 1.2, deg: 2, nature: "π* antienlazante", nodes: 2 },
+      { name: "3σu*", type: "antibonding", occ: 0, energy: 1.8, nature: "σ* antienlazante", nodes: 2 }
+    ]
+  },
+  {
+    id: "C2",
+    formula: "C₂",
+    name: "Dicarbono",
+    atomA: "C (2s² 2p²)",
+    atomB: "C (2s² 2p²)",
+    category: "homonuclear-pi",
+    bo: 2.0,
+    mag: "Diamagnético",
+    magDesc: "Todos los electrones apareados (μ = 0 μB).",
+    homo: "1πu",
+    lumo: "3σg",
+    notation: "KK 2σg² 2σu*² 1πu⁴",
+    stability: "Estable en Llama/Vapor",
+    stabColor: "#34d399",
+    stabDesc: "Enlace doble inusual compuesto exclusivamente por 2 enlaces π.",
+    freqVib: "1855 cm⁻¹",
+    dipole: "0.00 D",
+    deltaEN: 0.0,
+    theme: {
+      primary: "#10b981",
+      secondary: "#34d399",
+      accent: "#a7f3d0",
+      glow: "rgba(16, 185, 129, 0.4)",
+      bgGlow: "rgba(16, 185, 129, 0.1)"
+    },
+    levels: [
+      { name: "2σg", type: "bonding", occ: 2, energy: -1.2, nature: "σ enlazante", nodes: 0 },
+      { name: "2σu*", type: "antibonding", occ: 2, energy: -0.6, nature: "σ* antienlazante", nodes: 1 },
+      { name: "1πu", type: "bonding", occ: 4, energy: 0.2, deg: 2, nature: "π doblemente enlazante", nodes: 1 },
+      { name: "3σg", type: "bonding", occ: 0, energy: 0.7, nature: "σ enlazante", nodes: 0 },
+      { name: "1πg*", type: "antibonding", occ: 0, energy: 1.2, deg: 2, nature: "π* antienlazante", nodes: 2 },
+      { name: "3σu*", type: "antibonding", occ: 0, energy: 1.8, nature: "σ* antienlazante", nodes: 2 }
+    ]
+  },
+  {
+    id: "N2",
+    formula: "N₂",
+    name: "Dinitrógeno",
+    atomA: "N (2s² 2p³)",
+    atomB: "N (2s² 2p³)",
+    category: "homonuclear-triple",
+    bo: 3.0,
+    mag: "Diamagnético",
+    magDesc: "Todos los electrones apareados en capas cerradas ultrarresistentes.",
+    homo: "3σg",
+    lumo: "1πg*",
+    notation: "KK 2σg² 2σu*² 1πu⁴ 3σg²",
+    stability: "Extremadamente Inerte",
+    stabColor: "#38bdf8",
+    stabDesc: "Triple enlace covalente de máxima estabilidad y resistencia cuántica (945 kJ/mol).",
+    freqVib: "2358 cm⁻¹ (Enlace triple)",
+    dipole: "0.00 D",
+    deltaEN: 0.0,
+    theme: {
+      primary: "#3b82f6",
+      secondary: "#60a5fa",
+      accent: "#93c5fd",
+      glow: "rgba(59, 130, 246, 0.45)",
+      bgGlow: "rgba(59, 130, 246, 0.12)"
+    },
+    levels: [
+      { name: "2σg", type: "bonding", occ: 2, energy: -1.3, nature: "σ enlazante", nodes: 0 },
+      { name: "2σu*", type: "antibonding", occ: 2, energy: -0.7, nature: "σ* antienlazante", nodes: 1 },
+      { name: "1πu", type: "bonding", occ: 4, energy: 0.1, deg: 2, nature: "2 orbitales π enlazantes", nodes: 1 },
+      { name: "3σg", type: "bonding", occ: 2, energy: 0.6, nature: "σ enlazante de valencia", nodes: 0 },
+      { name: "1πg*", type: "antibonding", occ: 0, energy: 1.3, deg: 2, nature: "π* antienlazante", nodes: 2 },
+      { name: "3σu*", type: "antibonding", occ: 0, energy: 1.9, nature: "σ* antienlazante", nodes: 2 }
+    ]
+  },
+  {
+    id: "O2",
+    formula: "O₂",
+    name: "Dioxígeno",
+    atomA: "O (2s² 2p⁴)",
+    atomB: "O (2s² 2p⁴)",
+    category: "homonuclear-paramagnetic",
+    bo: 2.0,
+    mag: "Paramagnético 🧲",
+    magDesc: "2 electrones desapareados en 1πg* (μ = 2.83 μB). El O₂ líquido es atraído fuertemente por imanes.",
+    homo: "1πg*",
+    lumo: "3σu*",
+    notation: "KK 2σg² 2σu*² 3σg² 1πu⁴ (1πg*¹ = 1πg*¹)",
+    stability: "Estable / Muy Reactivo",
+    stabColor: "#34d399",
+    stabDesc: "Doble enlace con carácter de birradical magnético permanente (498 kJ/mol).",
+    freqVib: "1580 cm⁻¹",
+    dipole: "0.00 D (Paramagnético)",
+    deltaEN: 0.0,
+    theme: {
+      primary: "#10b981",
+      secondary: "#06b6d4",
+      accent: "#34d399",
+      glow: "rgba(16, 185, 129, 0.45)",
+      bgGlow: "rgba(6, 182, 212, 0.12)"
+    },
+    levels: [
+      { name: "2σg", type: "bonding", occ: 2, energy: -1.4, nature: "σ enlazante", nodes: 0 },
+      { name: "2σu*", type: "antibonding", occ: 2, energy: -0.8, nature: "σ* antienlazante", nodes: 1 },
+      { name: "3σg", type: "bonding", occ: 2, energy: -0.2, nature: "σ enlazante sin cruce s-p", nodes: 0 },
+      { name: "1πu", type: "bonding", occ: 4, energy: 0.3, deg: 2, nature: "π enlazante doble", nodes: 1 },
+      { name: "1πg*", type: "antibonding", occ: 2, energy: 1.1, deg: 2, nature: "π* degenerado con 2 e⁻ desapareados", nodes: 2 },
+      { name: "3σu*", type: "antibonding", occ: 0, energy: 1.8, nature: "σ* antienlazante", nodes: 2 }
+    ]
+  },
+  {
+    id: "F2",
+    formula: "F₂",
+    name: "Diflúor",
+    atomA: "F (2s² 2p⁵)",
+    atomB: "F (2s² 2p⁵)",
+    category: "homonuclear-repulsive",
+    bo: 1.0,
+    mag: "Diamagnético",
+    magDesc: "Todos los electrones apareados en orbitales moleculares saturados.",
+    homo: "1πg*",
+    lumo: "3σu*",
+    notation: "KK 2σg² 2σu*² 3σg² 1πu⁴ 1πg*⁴",
+    stability: "Enlace Débil / Muy Oxidante",
+    stabColor: "#fbbf24",
+    stabDesc: "Enlace simple debilitado severamente por repulsión culombiana de 4 electrones en π* (155 kJ/mol).",
+    freqVib: "916 cm⁻¹ (Enlace lábil)",
+    dipole: "0.00 D",
+    deltaEN: 0.0,
+    theme: {
+      primary: "#f59e0b",
+      secondary: "#ec4899",
+      accent: "#a855f7",
+      glow: "rgba(245, 158, 11, 0.4)",
+      bgGlow: "rgba(236, 72, 153, 0.12)"
+    },
+    levels: [
+      { name: "2σg", type: "bonding", occ: 2, energy: -1.5, nature: "σ enlazante", nodes: 0 },
+      { name: "2σu*", type: "antibonding", occ: 2, energy: -0.9, nature: "σ* antienlazante", nodes: 1 },
+      { name: "3σg", type: "bonding", occ: 2, energy: -0.3, nature: "σ enlazante", nodes: 0 },
+      { name: "1πu", type: "bonding", occ: 4, energy: 0.2, deg: 2, nature: "π enlazante", nodes: 1 },
+      { name: "1πg*", type: "antibonding", occ: 4, energy: 1.0, deg: 2, nature: "π* saturado con repulsión", nodes: 2 },
+      { name: "3σu*", type: "antibonding", occ: 0, energy: 1.8, nature: "σ* antienlazante", nodes: 2 }
+    ]
+  },
+  {
+    id: "HF",
+    formula: "HF",
+    name: "Fluoruro de Hidrógeno",
+    atomA: "H (1s¹)",
+    atomB: "F (2s² 2p⁵)",
+    category: "polar-extreme",
+    bo: 1.0,
+    mag: "Diamagnético",
+    magDesc: "Electrones pareados en enlace fuertemente polar y pares libres de flúor.",
+    homo: "1π",
+    lumo: "3σ*",
+    notation: "1σ² 2σ² 1π⁴",
+    stability: "Enlace Altamente Polar",
+    stabColor: "#ec4899",
+    stabDesc: "Enlace covalente con enorme atracción electrostática permanente (570 kJ/mol, ΔEN = 1.9).",
+    freqVib: "4138 cm⁻¹",
+    dipole: "1.82 D (Fuerte Dipolo)",
+    deltaEN: 1.78,
+    theme: {
+      primary: "#d946ef",
+      secondary: "#ec4899",
+      accent: "#38bdf8",
+      glow: "rgba(217, 70, 239, 0.45)",
+      bgGlow: "rgba(217, 70, 239, 0.12)"
+    },
+    levels: [
+      { name: "1σ", type: "bonding", occ: 2, energy: -1.7, nature: "σ no enlazante (carozo F 2s)", nodes: 0 },
+      { name: "2σ", type: "bonding", occ: 2, energy: -0.6, nature: "σ enlazante polarizado intensamente hacia F", nodes: 0 },
+      { name: "1π", type: "bonding", occ: 4, energy: 0.1, deg: 2, nature: "π no enlazante (pares libres de F)", nodes: 1 },
+      { name: "3σ*", type: "antibonding", occ: 0, energy: 1.4, nature: "σ* antienlazante (LUMO desocupado)", nodes: 1 }
+    ]
+  },
+  {
+    id: "CO",
+    formula: "CO",
+    name: "Monóxido de Carbono",
+    atomA: "C (2s² 2p²)",
+    atomB: "O (2s² 2p⁴)",
+    category: "polar-coordinative",
+    bo: 3.0,
+    mag: "Diamagnético",
+    magDesc: "Isoelectrónico con N₂ (10 electrones de valencia en orbitales cerrados).",
+    homo: "5σ",
+    lumo: "2π*",
+    notation: "3σ² 4σ*² 1π⁴ 5σ²",
+    stability: "Triple Enlace Ultrarresistente",
+    stabColor: "#38bdf8",
+    stabDesc: "Energía de disociación colosal: 1076 kJ/mol. Par libre de Carbono en HOMO como aceptor π y donador σ.",
+    freqVib: "2170 cm⁻¹",
+    dipole: "0.12 D (Coordinativo)",
+    deltaEN: 0.89,
+    theme: {
+      primary: "#6366f1",
+      secondary: "#38bdf8",
+      accent: "#818cf8",
+      glow: "rgba(99, 102, 241, 0.45)",
+      bgGlow: "rgba(99, 102, 241, 0.12)"
+    },
+    levels: [
+      { name: "3σ", type: "bonding", occ: 2, energy: -1.3, nature: "σ enlazante polarizado hacia O", nodes: 0 },
+      { name: "4σ*", type: "antibonding", occ: 2, energy: -0.7, nature: "σ* antienlazante con lóbulo en C", nodes: 1 },
+      { name: "1π", type: "bonding", occ: 4, energy: 0.1, deg: 2, nature: "π enlazante coordinado doble", nodes: 1 },
+      { name: "5σ", type: "bonding", occ: 2, energy: 0.6, nature: "HOMO con par solitario activo en C", nodes: 0 },
+      { name: "2π*", type: "antibonding", occ: 0, energy: 1.4, deg: 2, nature: "LUMO aceptor π-ácido reactivo", nodes: 2 }
+    ]
+  },
+  {
+    id: "NO",
+    formula: "NO",
+    name: "Óxido Nítrico",
+    atomA: "N (2s² 2p³)",
+    atomB: "O (2s² 2p⁴)",
+    category: "radical-pulsing",
+    bo: 2.5,
+    mag: "Paramagnético (Radical) ⚠️",
+    magDesc: "1 electrón desapareado en 2π* (μ = 1.73 μB). Mensajero biológico y vasodilatador celular.",
+    homo: "2π*",
+    lumo: "6σ*",
+    notation: "3σ² 4σ*² 1π⁴ 5σ² 2π*¹",
+    stability: "Radical Libre Estable",
+    stabColor: "#fbbf24",
+    stabDesc: "Orden fraccionario de 2.5. Reactividad radicalaria por electrón impar.",
+    freqVib: "1904 cm⁻¹",
+    dipole: "0.16 D",
+    deltaEN: 0.40,
+    theme: {
+      primary: "#8b5cf6",
+      secondary: "#f97316",
+      accent: "#fb923c",
+      glow: "rgba(139, 92, 246, 0.45)",
+      bgGlow: "rgba(249, 115, 22, 0.12)"
+    },
+    levels: [
+      { name: "3σ", type: "bonding", occ: 2, energy: -1.3, nature: "σ enlazante", nodes: 0 },
+      { name: "4σ*", type: "antibonding", occ: 2, energy: -0.7, nature: "σ* antienlazante", nodes: 1 },
+      { name: "1π", type: "bonding", occ: 4, energy: 0.1, deg: 2, nature: "π enlazante doble", nodes: 1 },
+      { name: "5σ", type: "bonding", occ: 2, energy: 0.5, nature: "σ enlazante", nodes: 0 },
+      { name: "2π*", type: "antibonding", occ: 1, energy: 1.2, deg: 2, nature: "π* con 1 electrón radical desapareado", nodes: 2 },
+      { name: "6σ*", type: "antibonding", occ: 0, energy: 1.8, nature: "σ* antienlazante (LUMO)", nodes: 2 }
+    ]
+  }
+];
+
+let currentMOMol = MO_MOLECULES[0];
+let currentMOIndex = 0;
+let isMOPhaseAnimating = true;
+let moPhaseAngle = 0;
+let moGlobalTime = 0;
+let moTransitionProgress = 1.0;
+let isMOContourInViewport = false;
+let moContourAnimId = null;
+
+// Partículas cuánticas de destello en el fondo del lienzo (|Ψ|²)
+const moQuantumSparkles = Array.from({ length: 42 }, () => ({
+  x: Math.random() * 520,
+  y: Math.random() * 400,
+  vx: (Math.random() - 0.5) * 0.35,
+  vy: (Math.random() - 0.5) * 0.35,
+  size: Math.random() * 2 + 0.8,
+  phase: Math.random() * Math.PI * 2,
+  speed: Math.random() * 0.03 + 0.015
+}));
+
+// Generar selector dinámico de moléculas
+function renderMOMoleculeButtons() {
+  const container = document.getElementById("moMolSelector");
+  if (!container) return;
+  container.innerHTML = MO_MOLECULES.map(m => {
+    let extraIcon = "";
+    if (m.mag.includes("Paramagnético")) extraIcon = " 🧲";
+    else if (m.category === "polar-extreme") extraIcon = " ⚡";
+    else if (m.category === "homonuclear-triple") extraIcon = " ≡";
+    else if (m.category === "radical-pulsing") extraIcon = " 🌀";
+    return `
+      <button class="btn btn-outline mo-mol-btn ${m.id === currentMOMol.id ? 'active' : ''}" 
+              onclick="selectMOMolecule('${m.id}')"
+              style="padding: 5px 11px; font-size: 0.8rem; font-weight: 700;">
+        <span>${m.formula}${extraIcon}</span>
+      </button>
+    `;
+  }).join("");
+}
+
+// Seleccionar molécula y actualizar reporte y animación
+function selectMOMolecule(id) {
+  const found = MO_MOLECULES.find(m => m.id === id);
+  if (!found) return;
+  currentMOMol = found;
+  
+  // Buscar índice de HOMO por defecto
+  const homoIdx = found.levels.findIndex(l => l.name === found.homo);
+  currentMOIndex = homoIdx >= 0 ? homoIdx : 0;
+  
+  // Reset de interpolación para transición suave
+  moTransitionProgress = 0.0;
+  
+  // Retroalimentación sonora según estabilidad
+  playQuantumResonanceSound(found.bo >= 3 ? 587 : (found.bo >= 2 ? 494 : (found.bo >= 1 ? 440 : 330)));
+
+  // Actualizar botones de selector
+  document.querySelectorAll(".mo-mol-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.textContent.trim().startsWith(found.formula));
+  });
+
+  // Actualizar select desplegable de orbitales
+  const select = document.getElementById("moOrbitalSelect");
+  if (select) {
+    select.innerHTML = found.levels.map((lvl, idx) => `
+      <option value="${idx}" ${idx === currentMOIndex ? 'selected' : ''}>OM: ${lvl.name} (${lvl.occ} e⁻) - ${lvl.type === 'bonding' ? 'Enlazante' : 'Antienlazante'}</option>
+    `).join("");
+  }
+
+  // Actualizar badges e info
+  const badge = document.getElementById("moMolFormulaBadge");
+  if (badge) badge.textContent = found.formula + " (" + found.name + ")";
+  
+  const notation = document.getElementById("moConfigNotation");
+  if (notation) notation.textContent = found.notation;
+
+  const boEl = document.getElementById("moStatBO");
+  if (boEl) boEl.textContent = found.bo.toFixed(1);
+
+  const boDescEl = document.getElementById("moStatBODesc");
+  if (boDescEl) {
+    const nb = found.levels.filter(l => l.type === "bonding").reduce((acc, l) => acc + l.occ, 0);
+    const na = found.levels.filter(l => l.type === "antibonding").reduce((acc, l) => acc + l.occ, 0);
+    boDescEl.textContent = `BO = (${nb} enlazantes - ${na} antienlazantes) / 2 = ${found.bo.toFixed(1)}. ${found.freqVib ? 'Vibración: ' + found.freqVib : ''}`;
+  }
+
+  const magEl = document.getElementById("moStatMag");
+  if (magEl) magEl.textContent = found.mag;
+
+  const magDescEl = document.getElementById("moStatMagDesc");
+  if (magDescEl) magDescEl.textContent = found.magDesc + (found.dipole ? ' Dipolo: ' + found.dipole : '');
+
+  const stabEl = document.getElementById("moStatStab");
+  if (stabEl) {
+    stabEl.textContent = found.stability;
+    stabEl.style.color = found.stabColor;
+  }
+
+  const stabDescEl = document.getElementById("moStatStabDesc");
+  if (stabDescEl) stabDescEl.textContent = found.stabDesc;
+
+  updateMOActiveOrbitalBadges();
+  renderMODiagram();
+}
+
+function changeActiveMO() {
+  const select = document.getElementById("moOrbitalSelect");
+  if (!select) return;
+  currentMOIndex = parseInt(select.value, 10) || 0;
+  updateMOActiveOrbitalBadges();
+  playQuantumResonanceSound(520);
+}
+
+function updateMOActiveOrbitalBadges() {
+  const lvl = currentMOMol.levels[currentMOIndex] || currentMOMol.levels[0];
+  const natBadge = document.getElementById("moOrbitalNatureBadge");
+  const nodBadge = document.getElementById("moNodalPlaneBadge");
+  if (natBadge) {
+    natBadge.textContent = lvl.nature;
+    natBadge.style.color = lvl.type === "bonding" ? "#34d399" : "#f87171";
+  }
+  if (nodBadge) {
+    nodBadge.textContent = `Planos Nodales: ${lvl.nodes} | Ocupación: ${lvl.occ} e⁻`;
+  }
+}
+
+function toggleMOPhaseAnim() {
+  isMOPhaseAnimating = !isMOPhaseAnimating;
+  const icon = document.getElementById("moAnimIcon");
+  if (icon) {
+    icon.textContent = isMOPhaseAnimating ? "⏸️" : "▶️";
+  }
+}
+
+function wakeMOLoop() {
+  const quantumTab = document.getElementById("tab-quantum");
+  const isTabActive = quantumTab && quantumTab.classList.contains("active");
+  if (isMOContourInViewport && isTabActive && activeQuantumSubmodule === "mo" && !document.hidden && !moContourAnimId) {
+    moContourAnimId = requestAnimationFrame(runMOContourFrame);
+  }
+}
+
+function runMOContourFrame() {
+  const quantumTab = document.getElementById("tab-quantum");
+  const isTabActive = quantumTab && quantumTab.classList.contains("active");
+  
+  // Pausa automática si no está en viewport, pestaña inactiva o documento oculto
+  if (!isMOContourInViewport || !isTabActive || activeQuantumSubmodule !== "mo" || document.hidden) {
+    moContourAnimId = null;
+    return;
+  }
+  
+  moGlobalTime += 0.02;
+  if (isMOPhaseAnimating) {
+    moPhaseAngle += 0.045;
+  }
+  if (moTransitionProgress < 1.0) {
+    moTransitionProgress = Math.min(1.0, moTransitionProgress + 0.05);
+  }
+  renderMOContour();
+  moContourAnimId = requestAnimationFrame(runMOContourFrame);
+}
+
+function startMOAnimationLoop() {
+  wakeMOLoop();
+}
+
+// RENDERIZADO DEL DIAGRAMA DE NIVELES DE ENERGÍA MO
+function renderMODiagram() {
+  const canvas = document.getElementById("moEnergyCanvas");
   if (!canvas) return;
-  const parentWidth = canvas.parentElement ? canvas.parentElement.clientWidth : 0;
-  const isMobile = window.innerWidth <= 1024;
-  const w = parentWidth > 0 ? parentWidth : (isMobile ? 360 : 640);
-  const h = isMobile ? 350 : 480;
-  if (canvas.width !== w || canvas.height !== h) {
-    canvas.width = w;
-    canvas.height = h;
-  }
-}
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  const w = rect.width || 380;
+  const h = rect.height || 380;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
 
-function toggleBurner() {
-  labState.burnerOn = !labState.burnerOn;
-  const btn = document.getElementById('btnBurner');
-  if (labState.burnerOn) {
-    btn.textContent = 'ON';
-    btn.classList.remove('btn-outline');
-    btn.classList.add('btn-primary');
-    labState.targetTemp = Math.max(labState.targetTemp, 65.0);
-    document.getElementById('tempSlider').value = labState.targetTemp;
-    addLabLog('🔥 Mechero Bunsen encendido. Calentando el fluido hacia ' + labState.targetTemp + ' °C.');
-  } else {
-    btn.textContent = 'OFF';
-    btn.classList.remove('btn-primary');
-    btn.classList.add('btn-outline');
-    labState.targetTemp = 20.0;
-    document.getElementById('tempSlider').value = 20;
-    addLabLog('💨 Mechero Bunsen apagado. Enfriando progresivamente a temperatura ambiente (20.0 °C).');
-  }
-}
+  const mol = currentMOMol;
+  const pad = 40;
+  const plotH = h - pad * 2;
+  const midX = w / 2;
+  const leftX = 70;
+  const rightX = w - 70;
 
-function setLabTemperature(val) {
-  labState.targetTemp = parseFloat(val);
-  if (labState.targetTemp > 25.0 && !labState.burnerOn) {
-    toggleBurner();
-  }
-}
+  // Eje de energía
+  ctx.strokeStyle = "rgba(148, 163, 184, 0.4)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(30, h - pad + 10);
+  ctx.lineTo(30, pad - 10);
+  ctx.stroke();
 
-function toggleStirrer() {
-  labState.stirrerOn = !labState.stirrerOn;
-  const btn = document.getElementById('btnStirrer');
-  if (labState.stirrerOn) {
-    btn.textContent = 'ON';
-    btn.classList.remove('btn-outline');
-    btn.classList.add('btn-primary');
-    addLabLog('🌀 Agitador magnético encendido a 450 RPM. Induciendo vórtice y homogeneizando solutos.');
-  } else {
-    btn.textContent = 'OFF';
-    btn.classList.remove('btn-primary');
-    btn.classList.add('btn-outline');
-    addLabLog('⏹️ Agitador magnético detenido. Flujo laminar en reposo.');
-  }
-}
+  ctx.beginPath();
+  ctx.moveTo(26, pad - 6);
+  ctx.lineTo(30, pad - 16);
+  ctx.lineTo(34, pad - 6);
+  ctx.fillStyle = "rgba(148, 163, 184, 0.7)";
+  ctx.fill();
 
-function addReagent(type) {
-  playWaterDropSound();
+  ctx.save();
+  ctx.translate(18, h / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillStyle = "#94a3b8";
+  ctx.font = 'bold 10px "Plus Jakarta Sans", sans-serif';
+  ctx.textAlign = "center";
+  ctx.fillText("Energía Cuántica (E)", 0, 0);
+  ctx.restore();
 
-  if (type === 'Na') {
-    labState.naMoles += 1;
-    labState.volume += 2.0;
-    // 2 Na + 2 H2O -> 2 NaOH + H2(g)
-    labState.ph = 13.6;
-    labState.temp = Math.min(100, labState.temp + 14.0);
-    playReactionFizzSound();
-    // Generar burbujas vigorosas
-    for (let i = 0; i < 25; i++) {
-      labState.bubbleParticles.push({
-        x: 270 + (Math.random() - 0.5) * 50,
-        y: 280,
-        r: 2 + Math.random() * 4,
-        vy: -2 - Math.random() * 3
-      });
-    }
-    addLabLog('💥 Reacción Redox del Sodio metálico: 2 Na(s) + 2 H₂O(l) → 2 NaOH(aq) + H₂(g)↑. Fuertemente exotérmica.');
+  const minE = -2.0;
+  const maxE = 2.2;
+  const getY = (e) => h - pad - ((e - minE) / (maxE - minE)) * plotH;
 
-  } else if (type === 'phenol') {
-    labState.hasPhenol = true;
-    addLabLog('💧 Fenolftaleína agregada (indicador de pH ácido-base). Intervalo de viraje de pH 8.2 (incoloro) a 10.0 (fucsia).');
+  ctx.fillStyle = "#94a3b8";
+  ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+  ctx.textAlign = "center";
+  ctx.fillText(mol.atomA, leftX, h - 14);
+  ctx.fillText(mol.atomB, rightX, h - 14);
 
-  } else if (type === 'HCl') {
-    labState.hclMoles += 1;
-    labState.volume += 5.0;
-    if (labState.ph > 7.0) {
-      labState.ph = 7.00;
-      labState.temp += 3.5;
-      addLabLog('⚖️ Neutralización exotérmica: H⁺(aq) + OH⁻(aq) → H₂O(l). pH restablecido a 7.00.');
-    } else {
-      labState.ph = 1.20;
-      addLabLog('🧪 Adición de HCl concentrado: El pH de la disolución cae drásticamente a 1.20.');
-    }
-
-  } else if (type === 'NaOH') {
-    labState.naohMoles += 1;
-    labState.volume += 5.0;
-    labState.ph = 13.50;
-    addLabLog('🧪 Hidróxido de Sodio añadido: concentración masiva de aniones hidroxilo OH⁻ (pH = 13.50).');
-
-  } else if (type === 'PbI2') {
-    labState.hasPbI2 = true;
-    labState.volume += 5.0;
-    playChimeSound();
-    for (let i = 0; i < 80; i++) {
-      labState.precipitateParticles.push({
-        x: 220 + Math.random() * 160,
-        y: 240 + Math.random() * 80,
-        r: 1.5 + Math.random() * 2.5,
-        vy: 0.3 + Math.random() * 0.4,
-        color: '#fbbf24'
-      });
-    }
-    addLabLog('✨ Precipitación "Lluvia de Oro": Pb²⁺(aq) + 2 I⁻(aq) → PbI₂(s)↓ (Precipitado cristalino amarillo brillante).');
-
-  } else if (type === 'CuSO4') {
-    labState.hasCuSO4 = true;
-    labState.volume += 5.0;
-    addLabLog('💙 Disolución de Sulfato de Cobre: Formación del complejo azul hexaaquacobre(II) [Cu(H₂O)₆]²⁺.');
-
-  } else if (type === 'NaHCO3') {
-    labState.volume += 3.0;
-    if (labState.ph < 5.0) {
-      playReactionFizzSound();
-      labState.ph = 6.8;
-      for (let i = 0; i < 35; i++) {
-        labState.bubbleParticles.push({
-          x: 230 + Math.random() * 140,
-          y: 310,
-          r: 2 + Math.random() * 3.5,
-          vy: -3 - Math.random() * 2.5
-        });
-      }
-      addLabLog('🫧 Efervescencia vigorosa de CO₂: HCO₃⁻(aq) + H⁺(aq) → H₂O(l) + CO₂(g)↑.');
-    } else {
-      labState.ph = 8.3;
-      addLabLog('🧂 Disolución amortiguadora de Bicarbonato de Sodio (pH levemente alcalino: 8.30).');
-    }
-  }
-
-  updateLabTelemetry();
-}
-
-function resetLab() {
-  labState.temp = 20.0;
-  labState.targetTemp = 20.0;
-  labState.ph = 7.00;
-  labState.volume = 150.0;
-  labState.burnerOn = false;
-  labState.stirrerOn = false;
-  labState.hasPhenol = false;
-  labState.hasCuSO4 = false;
-  labState.hasPbI2 = false;
-  labState.naMoles = 0;
-  labState.hclMoles = 0;
-  labState.naohMoles = 0;
-  labState.bubbleParticles.length = 0;
-  labState.precipitateParticles.length = 0;
-  labState.steamParticles.length = 0;
-
-  document.getElementById('btnBurner').textContent = 'OFF';
-  document.getElementById('btnBurner').classList.remove('btn-primary');
-  document.getElementById('btnBurner').classList.add('btn-outline');
-
-  document.getElementById('btnStirrer').textContent = 'OFF';
-  document.getElementById('btnStirrer').classList.remove('btn-primary');
-  document.getElementById('btnStirrer').classList.add('btn-outline');
-
-  document.getElementById('tempSlider').value = 20;
-
-  const logBox = document.getElementById('labLogBox');
-  if (logBox) logBox.innerHTML = '<div class="log-entry">🧪 Cristalería enjuagada y limpia con 150 mL de H₂O a 20.0 °C.</div>';
-
-  updateLabTelemetry();
-}
-
-function updateLabTelemetry() {
-  document.getElementById('labPhValue').textContent = `${labState.ph.toFixed(2)} (${labState.ph < 6.8 ? 'Ácido' : labState.ph > 7.2 ? 'Alcalino' : 'Neutro'})`;
-  document.getElementById('labTempValue').textContent = `${labState.temp.toFixed(1)} °C (${(labState.temp + 273.15).toFixed(1)} K)`;
-  document.getElementById('tempDisplay').textContent = `${labState.temp.toFixed(1)} °C`;
-  document.getElementById('labVolumeValue').textContent = `${labState.volume.toFixed(1)} mL`;
-
-  // Barra de pH
-  const pinPercent = Math.max(0, Math.min(100, (labState.ph / 14) * 100));
-  document.getElementById('phPin').style.left = `${pinPercent}%`;
-
-  // Iones presentes
-  const ions = [];
-  if (labState.hasCuSO4) ions.push('Cu²⁺', 'SO₄²⁻');
-  if (labState.hasPbI2) ions.push('PbI₂(s)↓', 'K⁺', 'NO₃⁻');
-  if (labState.hclMoles > 0) ions.push('Cl⁻');
-  if (labState.naMoles > 0 || labState.naohMoles > 0) ions.push('Na⁺');
-  if (labState.ph < 6.5) ions.push('H⁺(aq)');
-  if (labState.ph > 7.5) ions.push('OH⁻(aq)');
-  if (ions.length === 0) ions.push('H₂O pura');
-
-  document.getElementById('labIonsValue').textContent = ions.slice(0, 4).join(', ') + (ions.length > 4 ? '...' : '');
-}
-
-function addLabLog(msg) {
-  const logBox = document.getElementById('labLogBox');
-  if (!logBox) return;
-  const entry = document.createElement('div');
-  entry.className = 'log-entry';
-  entry.textContent = msg;
-  logBox.prepend(entry);
-}
-
-function selectLabGuide(guideKey) {
-  document.querySelectorAll('.reagent-btn').forEach(b => b.classList.remove('btn-callout'));
-  const tutor = document.getElementById('tutorInstructions');
-
-  if (guideKey === 'acid_base') {
-    tutor.textContent = 'Paso 1: Agrega Fenolftaleína (+ Gotas) y luego NaOH para observar el viraje a fucsia. Finalmente agrega HCl para neutralizar.';
-    document.getElementById('reagent-phenol').classList.add('btn-callout');
-  } else if (guideKey === 'redox_sodium') {
-    tutor.textContent = 'Paso 1: Dosifica Sodio Metálico (+ Na) al agua y observa la efervescencia vigorosa de H₂ y el aumento de pH.';
-    document.getElementById('reagent-Na').classList.add('btn-callout');
-  } else if (guideKey === 'gold_rain') {
-    tutor.textContent = 'Paso 1: Añade Lluvia de Oro (KI + Pb²⁺) para precipitar PbI₂. Luego enciende el Agitador para ver los cristales en suspensión.';
-    document.getElementById('reagent-PbI2').classList.add('btn-callout');
-  } else if (guideKey === 'effervescence') {
-    tutor.textContent = 'Paso 1: Acidifica la solución con HCl (+ HCl) y luego agrega Bicarbonato (+ NaHCO₃) para liberar CO₂.';
-    document.getElementById('reagent-HCl').classList.add('btn-callout');
-  } else {
-    tutor.textContent = 'Selecciona una guía experimental o añade reactivos libremente para observar fenómenos químicos reales.';
-  }
-}
-
-// Bucle Continuo de Renderizado del Escenario de Laboratorio en Canvas
-function startLabCanvasLoop() {
-  const canvas = document.getElementById('labCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  let time = 0;
-
-  function loop() {
-    if (!canvas || !ctx || canvas.width <= 0 || canvas.height <= 0) {
-      requestAnimationFrame(loop);
-      return;
-    }
-    time += 0.05;
-
-    // Termodinámica de transferencia de calor progresiva
-    if (Math.abs(labState.temp - labState.targetTemp) > 0.1) {
-      labState.temp += (labState.targetTemp - labState.temp) * 0.025;
-      updateLabTelemetry();
-    }
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const bx = canvas.width / 2; // Centro del vaso
-    const by = 340;              // Base del vaso
-    const bw = 220;              // Ancho del vaso
-    const bh = 220;              // Altura del vaso
-
-    // 1. MECHERO BUNSEN Y LLAMA ANIMADA (Debajo del vaso)
-    const burnerBaseY = by + 50;
-    // Soporte trípode
-    ctx.strokeStyle = '#475569';
-    ctx.lineWidth = 4;
+  const drawOABox = (x, y, label, occ = 1) => {
+    ctx.fillStyle = "#0f172a";
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.5)";
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(bx - 90, by + 10);
-    ctx.lineTo(bx - 90, burnerBaseY + 30);
-    ctx.moveTo(bx + 90, by + 10);
-    ctx.lineTo(bx + 90, burnerBaseY + 30);
+    ctx.roundRect(x - 22, y - 10, 44, 20, 4);
+    ctx.fill();
     ctx.stroke();
 
-    // Tubo del mechero
-    ctx.fillStyle = '#64748b';
-    ctx.fillRect(bx - 14, by + 20, 28, 45);
-    ctx.fillStyle = '#334155';
-    ctx.fillRect(bx - 26, by + 60, 52, 12);
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.textAlign = "center";
+    ctx.fillText(label, x, y - 13);
 
-    if (labState.burnerOn) {
-      // Llama azul viva
-      const flameHeight = 35 + Math.sin(time * 8) * 6;
-      const flameGrad = ctx.createLinearGradient(bx, by + 20, bx, by + 20 - flameHeight);
-      flameGrad.addColorStop(0, 'rgba(59, 130, 246, 0.9)');
-      flameGrad.addColorStop(0.6, 'rgba(14, 165, 233, 0.7)');
-      flameGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-
-      ctx.fillStyle = flameGrad;
-      ctx.beginPath();
-      ctx.moveTo(bx - 10, by + 20);
-      ctx.quadraticCurveTo(bx - 14, by + 10, bx, by + 20 - flameHeight);
-      ctx.quadraticCurveTo(bx + 14, by + 10, bx + 10, by + 20);
-      ctx.closePath();
-      ctx.fill();
-
-      // Cono interior de combustión
-      ctx.fillStyle = 'rgba(125, 211, 252, 0.85)';
-      ctx.beginPath();
-      ctx.moveTo(bx - 5, by + 20);
-      ctx.lineTo(bx, by + 20 - flameHeight * 0.5);
-      ctx.lineTo(bx + 5, by + 20);
-      ctx.closePath();
-      ctx.fill();
+    if (occ === 1) {
+      drawElectronArrow(ctx, x, y + 4, true, "#38bdf8");
+    } else if (occ === 2) {
+      drawElectronArrow(ctx, x - 5, y + 4, true, "#38bdf8");
+      drawElectronArrow(ctx, x + 5, y + 4, false, "#34d399");
     }
+  };
 
-    // 2. LÍQUIDO DEL VASO DE PRECIPITADOS
-    const liquidTopY = by - (labState.volume / 250) * 160;
+  const uniqueOA_A = [-1.0, 0.5];
+  const uniqueOA_B = [-1.0, 0.5];
 
-    // Determinación del color del líquido según indicadores y solutos
-    let liquidColor = 'rgba(224, 242, 254, 0.35)'; // Agua transparente
-    if (labState.hasPhenol && labState.ph >= 8.2) {
-      const alpha = Math.min(0.85, (labState.ph - 8.0) * 0.35);
-      liquidColor = `rgba(225, 29, 72, ${alpha})`; // Fucsia fenolftaleína
-    } else if (labState.hasCuSO4) {
-      liquidColor = 'rgba(14, 165, 233, 0.65)'; // Azul cobre
-    }
+  mol.levels.forEach((lvl, idx) => {
+    const y = getY(lvl.energy);
+    const isSelected = idx === currentMOIndex;
+    const isDegenerate = lvl.deg === 2;
+    const boxW = isDegenerate ? 74 : 44;
+    const boxH = 20;
 
-    ctx.save();
-    ctx.fillStyle = liquidColor;
+    ctx.strokeStyle = isSelected ? mol.theme.primary : "rgba(148, 163, 184, 0.25)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
     ctx.beginPath();
-    // Vórtice dinámico si el agitador está encendido
-    const vortexDepth = labState.stirrerOn ? 18 : 0;
-    ctx.moveTo(bx - bw / 2 + 10, liquidTopY);
-    ctx.quadraticCurveTo(bx, liquidTopY + vortexDepth, bx + bw / 2 - 10, liquidTopY);
-    ctx.lineTo(bx + bw / 2 - 10, by);
-    ctx.lineTo(bx - bw / 2 + 10, by);
+    ctx.moveTo(leftX + 24, getY(lvl.energy > 0 ? (uniqueOA_A[1] || uniqueOA_A[0]) : uniqueOA_A[0]));
+    ctx.lineTo(midX - boxW / 2, y);
+    ctx.moveTo(rightX - 24, getY(lvl.energy > 0 ? (uniqueOA_B[1] || uniqueOA_B[0]) : uniqueOA_B[0]));
+    ctx.lineTo(midX + boxW / 2, y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = isSelected ? "rgba(56, 189, 248, 0.22)" : "#0f172a";
+    ctx.strokeStyle = isSelected ? mol.theme.primary : (lvl.type === "bonding" ? "#34d399" : "#f87171");
+    ctx.lineWidth = isSelected ? 2.5 : 1.5;
+    ctx.beginPath();
+    ctx.roundRect(midX - boxW / 2, y - boxH / 2, boxW, boxH, 5);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = isSelected ? mol.theme.primary : "#f8fafc";
+    ctx.font = 'bold 11px "JetBrains Mono", monospace';
+    ctx.textAlign = "center";
+    ctx.fillText(lvl.name, midX, y - boxH / 2 - 4);
+
+    if (isDegenerate) {
+      const box1X = midX - 18;
+      const box2X = midX + 18;
+      let eRem = lvl.occ;
+      if (eRem === 1) {
+        drawElectronArrow(ctx, box1X, y + 4, true, mol.theme.primary);
+      } else if (eRem === 2) {
+        drawElectronArrow(ctx, box1X, y + 4, true, mol.theme.primary);
+        drawElectronArrow(ctx, box2X, y + 4, true, mol.theme.primary);
+      } else if (eRem === 3) {
+        drawElectronArrow(ctx, box1X - 4, y + 4, true, mol.theme.primary);
+        drawElectronArrow(ctx, box1X + 4, y + 4, false, "#34d399");
+        drawElectronArrow(ctx, box2X, y + 4, true, mol.theme.primary);
+      } else if (eRem >= 4) {
+        drawElectronArrow(ctx, box1X - 4, y + 4, true, mol.theme.primary);
+        drawElectronArrow(ctx, box1X + 4, y + 4, false, "#34d399");
+        drawElectronArrow(ctx, box2X - 4, y + 4, true, mol.theme.primary);
+        drawElectronArrow(ctx, box2X + 4, y + 4, false, "#34d399");
+      }
+    } else {
+      if (lvl.occ === 1) {
+        drawElectronArrow(ctx, midX, y + 4, true, mol.theme.primary);
+      } else if (lvl.occ >= 2) {
+        drawElectronArrow(ctx, midX - 5, y + 4, true, mol.theme.primary);
+        drawElectronArrow(ctx, midX + 5, y + 4, false, "#34d399");
+      }
+    }
+
+    if (lvl.name === mol.homo) {
+      ctx.fillStyle = "#38bdf8";
+      ctx.font = 'bold 9px "Plus Jakarta Sans", sans-serif';
+      ctx.textAlign = "left";
+      ctx.fillText("← HOMO", midX + boxW / 2 + 6, y + 4);
+    } else if (lvl.name === mol.lumo) {
+      ctx.fillStyle = "#fbbf24";
+      ctx.font = 'bold 9px "Plus Jakarta Sans", sans-serif';
+      ctx.textAlign = "left";
+      ctx.fillText("← LUMO", midX + boxW / 2 + 6, y + 4);
+    }
+  });
+
+  uniqueOA_A.forEach((eVal, i) => drawOABox(leftX, getY(eVal), i === 0 ? "1s/2s" : "2p", 2));
+  uniqueOA_B.forEach((eVal, i) => drawOABox(rightX, getY(eVal), i === 0 ? "1s/2s" : "2p", 2));
+}
+
+function drawElectronArrow(ctx, x, y, isUp, color) {
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  if (isUp) {
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y - 10);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y - 10);
+    ctx.lineTo(x - 3, y - 6);
+    ctx.lineTo(x, y - 6);
     ctx.closePath();
     ctx.fill();
-    ctx.restore();
-
-    // 3. AGITADOR MAGNÉTICO (Perla giratoria en el fondo)
-    if (labState.stirrerOn) {
-      const pRot = time * 18;
-      const pLen = Math.cos(pRot) * 26;
-      ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = '#94a3b8';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.ellipse(bx, by - 6, Math.abs(pLen) + 4, 5, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-    }
-
-    // 4. PARTICULAS DE PRECIPITADO (Lluvia de Oro PbI2)
-    if (labState.hasPbI2) {
-      labState.precipitateParticles.forEach(p => {
-        if (labState.stirrerOn) {
-          // Movimiento turbulento en torbellino
-          p.x += Math.sin(time * 3 + p.y) * 2;
-          p.y += (Math.random() - 0.5) * 2;
-        } else {
-          // Sedimentación hacia el fondo
-          if (p.y < by - 6) p.y += p.vy;
-        }
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fill();
-      });
-    }
-
-    // 5. BURBUJAS DE GAS / EBULLICIÓN
-    if (labState.temp >= 75.0 || labState.bubbleParticles.length > 0) {
-      if (labState.temp >= 75.0 && Math.random() < (labState.temp - 70) * 0.04) {
-        labState.bubbleParticles.push({
-          x: bx - bw / 2 + 20 + Math.random() * (bw - 40),
-          y: by - 10,
-          r: 2 + Math.random() * 4,
-          vy: -2 - Math.random() * 3
-        });
-      }
-
-      for (let i = labState.bubbleParticles.length - 1; i >= 0; i--) {
-        const b = labState.bubbleParticles[i];
-        b.y += b.vy;
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-        ctx.stroke();
-
-        if (b.y <= liquidTopY) {
-          labState.bubbleParticles.splice(i, 1);
-        }
-      }
-    }
-
-    // 6. VAPOR DE AGUA (A temperaturas mayores a 65 °C)
-    if (labState.temp >= 65.0) {
-      if (Math.random() < 0.3) {
-        labState.steamParticles.push({
-          x: bx - 40 + Math.random() * 80,
-          y: liquidTopY,
-          r: 6 + Math.random() * 8,
-          alpha: 0.45,
-          vx: (Math.random() - 0.5) * 0.8,
-          vy: -1.5 - Math.random() * 1.5
-        });
-      }
-
-      for (let i = labState.steamParticles.length - 1; i >= 0; i--) {
-        const s = labState.steamParticles[i];
-        s.x += s.vx;
-        s.y += s.vy;
-        s.r += 0.3;
-        s.alpha -= 0.01;
-
-        ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0, s.alpha)})`;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fill();
-
-        if (s.alpha <= 0) labState.steamParticles.splice(i, 1);
-      }
-    }
-
-    // 7. CRISTALERÍA DEL VASO DE PRECIPITADOS (Graduado de vidrio)
-    ctx.strokeStyle = '#94a3b8';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    // Pico vertedor a la izquierda
-    ctx.moveTo(bx - bw / 2 - 8, by - bh);
-    ctx.lineTo(bx - bw / 2, by - bh + 12);
-    ctx.lineTo(bx - bw / 2, by);
-    ctx.quadraticCurveTo(bx - bw / 2, by + 8, bx - bw / 2 + 10, by + 8);
-    ctx.lineTo(bx + bw / 2 - 10, by + 8);
-    ctx.quadraticCurveTo(bx + bw / 2, by + 8, bx + bw / 2, by);
-    ctx.lineTo(bx + bw / 2, by - bh);
+  } else {
+    ctx.moveTo(x, y - 10);
+    ctx.lineTo(x, y);
     ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + 3, y - 4);
+    ctx.lineTo(x, y - 4);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
 
-    // Marcas de graduación del vaso (50, 100, 150, 200, 250 mL)
-    ctx.fillStyle = '#64748b';
-    ctx.font = '600 10px "JetBrains Mono", monospace';
-    [50, 100, 150, 200, 250].forEach(vol => {
-      const markY = by - (vol / 250) * 160;
-      ctx.strokeStyle = '#94a3b8';
-      ctx.lineWidth = 1.5;
+// =========================================================================
+// RENDERIZADO VISUAL ÚNICO Y DIFERENCIADO POR CADA MOLÉCULA (|Ψ|²)
+// =========================================================================
+
+function renderMOContour() {
+  const canvas = document.getElementById("moContourCanvas");
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  const w = rect.width || 420;
+  const h = rect.height || 380;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+
+  const mol = currentMOMol;
+  const lvl = mol.levels[currentMOIndex] || mol.levels[0];
+  const isBonding = lvl.type === "bonding";
+  const isPi = lvl.name.includes("π");
+  const midX = w / 2;
+  const midY = h / 2;
+
+  // 1. Partículas de destello cuántico en el fondo con deriva browniana
+  moQuantumSparkles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    if (p.x < 0) p.x = w;
+    if (p.x > w) p.x = 0;
+    if (p.y < 0) p.y = h;
+    if (p.y > h) p.y = 0;
+    const sparkleAlpha = 0.15 + 0.4 * Math.sin(moGlobalTime * 2.5 + p.phase) ** 2;
+    ctx.fillStyle = mol.theme.secondary;
+    ctx.globalAlpha = sparkleAlpha;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1.0;
+
+  // 2. Eje internuclear de simetría con graduación cuántica
+  ctx.strokeStyle = "rgba(100, 116, 139, 0.25)";
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(35, midY);
+  ctx.lineTo(w - 35, midY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Fase armónica temporal Ψ(t) = Ψ₀ e^(-iEt/ħ)
+  const osc = Math.cos(moPhaseAngle) * 0.12 + 1.0;
+  const fastOsc = Math.sin(moGlobalTime * 6.0);
+
+  // Separación internuclear adaptada a cada molécula
+  let dNuclei = 86;
+  if (mol.id === "H2") dNuclei = 78;
+  else if (mol.id === "Li2") dNuclei = 108;
+  else if (mol.id === "F2") dNuclei = 94;
+  else if (mol.id === "HF") dNuclei = 88;
+
+  let nucA_X = midX - dNuclei / 2;
+  let nucB_X = midX + dNuclei / 2;
+
+  // =========================================================================
+  // BIFURCACIÓN DE FÍSICA Y GRÁFICOS PERSONALIZADOS POR MOLÉCULA
+  // =========================================================================
+
+  if (mol.id === "H2") {
+    // -------------------------------------------------------------
+    // H₂: Molécula ligera homonuclear, 1σg puro, pulsación armónica rápida
+    // -------------------------------------------------------------
+    const rX = 85 * osc;
+    const rY = 56 * osc;
+    
+    // Nube elipsoidal cuántica coalescente ultra suave
+    const gradH2 = ctx.createRadialGradient(midX, midY, 6, midX, midY, rX);
+    gradH2.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+    gradH2.addColorStop(0.25, "rgba(56, 189, 248, 0.85)");
+    gradH2.addColorStop(0.65, "rgba(14, 165, 233, 0.35)");
+    gradH2.addColorStop(1, "rgba(14, 165, 233, 0)");
+    ctx.fillStyle = gradH2;
+    ctx.beginPath();
+    ctx.ellipse(midX, midY, rX, rY, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ondas de interferencia constructiva circulares en expansión
+    [0.4, 0.7, 1.0].forEach((ringFactor, i) => {
+      const ringR = (rX * ringFactor + (moGlobalTime * 18) % 35);
+      ctx.strokeStyle = `rgba(56, 189, 248, ${0.28 / (i + 1)})`;
+      ctx.lineWidth = 1.2;
       ctx.beginPath();
-      ctx.moveTo(bx - bw / 2, markY);
-      ctx.lineTo(bx - bw / 2 + 18, markY);
+      ctx.ellipse(midX, midY, ringR, ringR * 0.65, 0, 0, Math.PI * 2);
       ctx.stroke();
-      ctx.fillText(`${vol} mL`, bx - bw / 2 + 24, markY + 3);
     });
 
-    // 8. TERMÓMETRO DE INMERSIÓN EN EL VASO
-    const tx = bx + 65;
-    const tyTop = by - 210;
-    const tyBot = by - 15;
-    // Tubo de vidrio
-    ctx.fillStyle = 'rgba(241, 245, 249, 0.8)';
-    ctx.strokeStyle = '#64748b';
-    ctx.lineWidth = 1.5;
-    ctx.fillRect(tx - 4, tyTop, 8, tyBot - tyTop);
-    ctx.strokeRect(tx - 4, tyTop, 8, tyBot - tyTop);
+    // 2 partículas de probabilidad cuántica en órbita rápida entrelazada
+    const pAngle = moGlobalTime * 4.2;
+    [-1, 1].forEach((dir) => {
+      const px = midX + Math.cos(pAngle * dir) * 38;
+      const py = midY + Math.sin(pAngle * dir) * 22;
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowColor = "#38bdf8";
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    });
 
-    // Bulbo inferior
-    ctx.fillStyle = '#ef4444';
+  } else if (mol.id === "O2") {
+    // -------------------------------------------------------------
+    // O₂: Birradical paramagnético con 2 electrones desapareados en 1πg*
+    // -------------------------------------------------------------
+    // Nube de doble enlace central
+    [-28, 28].forEach(offY => {
+      const gradO2 = ctx.createRadialGradient(midX, midY + offY, 4, midX, midY + offY, 68 * osc);
+      gradO2.addColorStop(0, "rgba(16, 185, 129, 0.85)");
+      gradO2.addColorStop(0.45, "rgba(6, 182, 212, 0.4)");
+      gradO2.addColorStop(1, "rgba(6, 182, 212, 0)");
+      ctx.fillStyle = gradO2;
+      ctx.beginPath();
+      ctx.ellipse(midX, midY + offY, 82 * osc, 30 * osc, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // LÍNEAS DE FLUJO MAGNÉTICO DIPOLAR (Paramagnetismo Macroscópico)
+    ctx.setLineDash([4, 4]);
+    [-65, -45, 45, 65].forEach((arcY, idx) => {
+      ctx.strokeStyle = `rgba(16, 185, 129, ${0.45 - Math.abs(arcY) * 0.003})`;
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(nucA_X - 15, midY);
+      ctx.bezierCurveTo(nucA_X - 25, midY + arcY * 1.5, nucB_X + 25, midY + arcY * 1.5, nucB_X + 15, midY);
+      ctx.stroke();
+
+      // Flechas direccionales de campo magnético B
+      const tParam = (moGlobalTime * 0.4 + idx * 0.25) % 1.0;
+      const bX = (1 - tParam) * (nucA_X - 10) + tParam * (nucB_X + 10);
+      const bY = midY + arcY * 1.3 * Math.sin(tParam * Math.PI);
+      ctx.fillStyle = "#34d399";
+      ctx.beginPath();
+      ctx.arc(bX, bY, 2.8, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.setLineDash([]);
+
+    // 2 electrones desapareados con espín paralelo (Hund) precesando en π*
+    [-34, 34].forEach((posY, idx) => {
+      const spinAngle = moGlobalTime * 3.0 + idx * Math.PI;
+      const ex = midX + Math.sin(spinAngle) * 32;
+      const ey = midY + posY + Math.cos(spinAngle) * 12;
+      drawElectronArrow(ctx, ex, ey + 4, true, "#34d399");
+    });
+
+  } else if (mol.id === "N2") {
+    // -------------------------------------------------------------
+    // N₂: Triple enlace de máxima estabilidad (945 kJ/mol, BO = 3)
+    // -------------------------------------------------------------
+    // Lóbulo central cilíndrico ultra denso (1σ)
+    const gradSigmaN2 = ctx.createRadialGradient(midX, midY, 6, midX, midY, 82 * osc);
+    gradSigmaN2.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+    gradSigmaN2.addColorStop(0.2, "rgba(96, 165, 250, 0.85)");
+    gradSigmaN2.addColorStop(0.6, "rgba(59, 130, 246, 0.4)");
+    gradSigmaN2.addColorStop(1, "rgba(59, 130, 246, 0)");
+    ctx.fillStyle = gradSigmaN2;
     ctx.beginPath();
-    ctx.arc(tx, tyBot, 8, 0, Math.PI * 2);
+    ctx.ellipse(midX, midY, 96 * osc, 42 * osc, 0, 0, Math.PI * 2);
     ctx.fill();
+
+    // Dos lóbulos π perpendiculares arriba y abajo
+    [-36, 36].forEach(offY => {
+      const gradPi = ctx.createRadialGradient(midX, midY + offY, 4, midX, midY + offY, 65 * osc);
+      gradPi.addColorStop(0, "rgba(96, 165, 250, 0.75)");
+      gradPi.addColorStop(0.5, "rgba(37, 99, 235, 0.3)");
+      gradPi.addColorStop(1, "rgba(37, 99, 235, 0)");
+      ctx.fillStyle = gradPi;
+      ctx.beginPath();
+      ctx.ellipse(midX, midY + offY, 86 * osc, 28 * osc, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // 3 CORRIENTES CUÁNTICAS HELICOIDALES EN ROTACIÓN (Triple Enlace)
+    [0, (Math.PI * 2) / 3, (Math.PI * 4) / 3].forEach((phaseOffset, idx) => {
+      const tH = moGlobalTime * 3.6 + phaseOffset;
+      const px = midX + Math.sin(tH) * 52;
+      const py = midY + Math.cos(tH) * (26 + idx * 4);
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowColor = "#60a5fa";
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.arc(px, py, 3.8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+
+  } else if (mol.id === "F2") {
+    // -------------------------------------------------------------
+    // F₂: Enlace simple débil con alta repulsión interelectrónica (155 kJ/mol)
+    // -------------------------------------------------------------
+    // Cuello internuclear delgado y constreñido
+    const gradF2Bond = ctx.createRadialGradient(midX, midY, 3, midX, midY, 45 * osc);
+    gradF2Bond.addColorStop(0, "rgba(245, 158, 11, 0.7)");
+    gradF2Bond.addColorStop(0.5, "rgba(236, 72, 153, 0.3)");
+    gradF2Bond.addColorStop(1, "rgba(236, 72, 153, 0)");
+    ctx.fillStyle = gradF2Bond;
+    ctx.beginPath();
+    ctx.ellipse(midX, midY, 48 * osc, 24 * osc, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 6 LÓBULOS DE REPULSIÓN DE PARES SOLITARIOS (3 en cada átomo de Flúor)
+    [ { x: nucA_X, dir: -1 }, { x: nucB_X, dir: 1 } ].forEach(nuc => {
+      [-42, 0, 42].forEach(angDeg => {
+        const rad = (angDeg * Math.PI) / 180;
+        const lobeDist = 44 + Math.sin(moGlobalTime * 3.0 + rad) * 5;
+        const lx = nuc.x + Math.cos(rad) * lobeDist * nuc.dir;
+        const ly = midY + Math.sin(rad) * lobeDist;
+        
+        const gradLobe = ctx.createRadialGradient(lx, ly, 3, lx, ly, 32);
+        gradLobe.addColorStop(0, "rgba(245, 158, 11, 0.75)");
+        gradLobe.addColorStop(0.5, "rgba(168, 85, 247, 0.3)");
+        gradLobe.addColorStop(1, "rgba(168, 85, 247, 0)");
+        ctx.fillStyle = gradLobe;
+        ctx.beginPath();
+        ctx.arc(lx, ly, 22, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Flecha vectorial de repulsión electrostática
+        ctx.strokeStyle = "rgba(239, 68, 68, 0.5)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(nuc.x, midY);
+        ctx.lineTo(lx, ly);
+        ctx.stroke();
+      });
+    });
+
+  } else if (mol.id === "HF") {
+    // -------------------------------------------------------------
+    // HF: Momento dipolar extremo (μ = 1.82 D, ΔEN = 1.9)
+    // -------------------------------------------------------------
+    // Densidad concentrada masivamente en Flúor (85% a la derecha)
+    const fCenter = nucB_X + 8;
+    const hCenter = nucA_X - 10;
+
+    // Gran nube densa en Flúor
+    const gradF = ctx.createRadialGradient(fCenter, midY, 6, fCenter, midY, 92 * osc);
+    gradF.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+    gradF.addColorStop(0.2, "rgba(217, 70, 239, 0.85)");
+    gradF.addColorStop(0.55, "rgba(162, 28, 175, 0.45)");
+    gradF.addColorStop(1, "rgba(162, 28, 175, 0)");
+    ctx.fillStyle = gradF;
+    ctx.beginPath();
+    ctx.arc(fCenter, midY, 88 * osc, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Pequeño halo tenue desapantallado en Hidrógeno
+    const gradH = ctx.createRadialGradient(hCenter, midY, 2, hCenter, midY, 32 * osc);
+    gradH.addColorStop(0, "rgba(255, 255, 255, 0.8)");
+    gradH.addColorStop(0.4, "rgba(56, 189, 248, 0.4)");
+    gradH.addColorStop(1, "rgba(56, 189, 248, 0)");
+    ctx.fillStyle = gradH;
+    ctx.beginPath();
+    ctx.arc(hCenter, midY, 30 * osc, 0, Math.PI * 2);
+    ctx.fill();
+
+    // LÍNEAS DE CAMPO ELÉCTRICO DIELECTRICO STREAMING (E-Field de δ+ a δ-)
+    [-45, -22, 0, 22, 45].forEach((offY, idx) => {
+      ctx.strokeStyle = "rgba(217, 70, 239, 0.35)";
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(hCenter + 12, midY + offY * 0.4);
+      ctx.quadraticCurveTo(midX, midY + offY * 1.4, fCenter - 20, midY + offY * 0.8);
+      ctx.stroke();
+
+      // Partícula de carga viajando por la línea de campo
+      const tE = (moGlobalTime * 0.7 + idx * 0.2) % 1.0;
+      const px = (1 - tE) * (hCenter + 12) + tE * (fCenter - 20);
+      const py = midY + offY * (0.4 + 0.9 * Math.sin(tE * Math.PI));
+      ctx.fillStyle = "#d946ef";
+      ctx.beginPath();
+      ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Vector de Momento Dipolar (μ = 1.82 D) con cruz (+) en H y flecha en F
+    const arrowY = midY + 98;
+    ctx.strokeStyle = "#ec4899";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(hCenter + 10, arrowY);
+    ctx.lineTo(fCenter - 10, arrowY);
     ctx.stroke();
 
-    // Columna de mercurio/alcohol graduada según temperatura
-    const mercuryHeight = ((labState.temp - 20) / 80) * (tyBot - tyTop - 30);
-    ctx.fillStyle = '#ef4444';
-    ctx.fillRect(tx - 2, tyBot - mercuryHeight, 4, mercuryHeight);
+    // Cruz positiva en H
+    ctx.beginPath();
+    ctx.moveTo(hCenter + 22, arrowY - 6);
+    ctx.lineTo(hCenter + 22, arrowY + 6);
+    ctx.stroke();
 
-    requestAnimationFrame(loop);
+    // Punta de flecha en F
+    ctx.fillStyle = "#ec4899";
+    ctx.beginPath();
+    ctx.moveTo(fCenter - 10, arrowY);
+    ctx.lineTo(fCenter - 22, arrowY - 6);
+    ctx.lineTo(fCenter - 22, arrowY + 6);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = "#f472b6";
+    ctx.font = 'bold 10px "JetBrains Mono", monospace';
+    ctx.textAlign = "center";
+    ctx.fillText("μ = 1.82 D (Dipolo Eléctrico)", midX, arrowY - 9);
+
+  } else if (mol.id === "CO") {
+    // -------------------------------------------------------------
+    // CO: Coordinativo con par libre frontal de Carbono (HOMO 5σ)
+    // -------------------------------------------------------------
+    // Lóbulo prominente en Carbono (HOMO con par libre proyectado a la izquierda)
+    const cLobeX = nucA_X - 25;
+    const gradCLobe = ctx.createRadialGradient(cLobeX, midY, 4, cLobeX, midY, 65 * osc);
+    gradCLobe.addColorStop(0, "rgba(99, 102, 241, 0.9)");
+    gradCLobe.addColorStop(0.5, "rgba(56, 189, 248, 0.4)");
+    gradCLobe.addColorStop(1, "rgba(56, 189, 248, 0)");
+    ctx.fillStyle = gradCLobe;
+    ctx.beginPath();
+    ctx.ellipse(cLobeX, midY, 52 * osc, 40 * osc, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Densidad electronegativa en Oxígeno a la derecha
+    const gradO = ctx.createRadialGradient(nucB_X, midY, 4, nucB_X, midY, 75 * osc);
+    gradO.addColorStop(0, "rgba(56, 189, 248, 0.85)");
+    gradO.addColorStop(0.5, "rgba(99, 102, 241, 0.35)");
+    gradO.addColorStop(1, "rgba(99, 102, 241, 0)");
+    ctx.fillStyle = gradO;
+    ctx.beginPath();
+    ctx.ellipse(nucB_X, midY, 68 * osc, 48 * osc, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ondas de retrodonación π entre C y O
+    [-22, 22].forEach(offY => {
+      ctx.strokeStyle = "rgba(99, 102, 241, 0.5)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.ellipse(midX, midY + offY, 60, 16, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+
+  } else if (mol.id === "NO") {
+    // -------------------------------------------------------------
+    // NO: Radical libre heteronuclear impar con 1 e⁻ en 2π*
+    // -------------------------------------------------------------
+    [-24, 24].forEach(offY => {
+      const gradNO = ctx.createRadialGradient(midX, midY + offY, 4, midX, midY + offY, 70 * osc);
+      gradNO.addColorStop(0, "rgba(139, 92, 246, 0.85)");
+      gradNO.addColorStop(0.5, "rgba(249, 115, 22, 0.35)");
+      gradNO.addColorStop(1, "rgba(249, 115, 22, 0)");
+      ctx.fillStyle = gradNO;
+      ctx.beginPath();
+      ctx.ellipse(midX, midY + offY, 76 * osc, 28 * osc, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Solitón de onda de espín radical rotando en el extremo de Nitrógeno
+    const radicalAngle = moGlobalTime * 4.0;
+    const radX = nucA_X + Math.cos(radicalAngle) * 28;
+    const radY = midY + Math.sin(radicalAngle) * 28;
+    ctx.fillStyle = "#f97316";
+    ctx.shadowColor = "#f97316";
+    ctx.shadowBlur = 15;
+    ctx.beginPath();
+    ctx.arc(radX, radY, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+  } else if (mol.id === "Li2") {
+    // -------------------------------------------------------------
+    // Li₂: Alcalino con enorme nube difusa 2σ y nodos compactos 1s
+    // -------------------------------------------------------------
+    // Nube difusa 2σ gigante
+    const gradLi2 = ctx.createRadialGradient(midX, midY, 8, midX, midY, 130 * osc);
+    gradLi2.addColorStop(0, "rgba(245, 158, 11, 0.7)");
+    gradLi2.addColorStop(0.35, "rgba(251, 191, 36, 0.3)");
+    gradLi2.addColorStop(0.75, "rgba(245, 158, 11, 0.08)");
+    gradLi2.addColorStop(1, "rgba(245, 158, 11, 0)");
+    ctx.fillStyle = gradLi2;
+    ctx.beginPath();
+    ctx.ellipse(midX, midY, 135 * osc, 80 * osc, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Carozos compactos 1s² dentro de cada núcleo
+    [nucA_X, nucB_X].forEach(nx => {
+      ctx.strokeStyle = "#ef4444";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(nx, midY, 18, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(239, 68, 68, 0.35)";
+      ctx.fill();
+    });
+
+  } else if (mol.id === "He2") {
+    // -------------------------------------------------------------
+    // He₂: BO = 0. Repulsión e interferencia destructiva pura
+    // -------------------------------------------------------------
+    [ { x: nucA_X - 16, c: "#ef4444" }, { x: nucB_X + 16, c: "#f97316" } ].forEach(side => {
+      const gradRep = ctx.createRadialGradient(side.x, midY, 4, side.x, midY, 58 * osc);
+      gradRep.addColorStop(0, side.c);
+      gradRep.addColorStop(0.6, "rgba(239, 68, 68, 0.2)");
+      gradRep.addColorStop(1, "rgba(239, 68, 68, 0)");
+      ctx.fillStyle = gradRep;
+      ctx.beginPath();
+      ctx.ellipse(side.x, midY, 52 * osc, 48 * osc, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Muro Nodal Destructivo Central
+    ctx.strokeStyle = "#ef4444";
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(midX, midY - 95);
+    ctx.lineTo(midX, midY + 95);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = "#ef4444";
+    ctx.font = 'bold 11px "JetBrains Mono", monospace';
+    ctx.textAlign = "center";
+    ctx.fillText("Muro de Repulsión (Ψ = 0)", midX, midY - 105);
+
+  } else {
+    // -------------------------------------------------------------
+    // Genérico / B₂ / C₂: Orbitales π simétricos
+    // -------------------------------------------------------------
+    [-32, 32].forEach(offY => {
+      const gradGen = ctx.createRadialGradient(midX, midY + offY, 4, midX, midY + offY, 70 * osc);
+      gradGen.addColorStop(0, mol.theme.primary);
+      gradGen.addColorStop(0.5, mol.theme.secondary);
+      gradGen.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = gradGen;
+      ctx.beginPath();
+      ctx.ellipse(midX, midY + offY, 80 * osc, 30 * osc, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
   }
 
-  loop();
+  // =========================================================================
+  // SOBRECAPA DEL ORBITAL SELECCIONADO EN EL DESPLEGABLE (FASES + / -)
+  // =========================================================================
+  if (!isBonding) {
+    // Plano Nodal vertical para orbital antienlazante
+    ctx.strokeStyle = "#ef4444";
+    ctx.lineWidth = 1.6;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(midX, midY - 90);
+    ctx.lineTo(midX, midY + 90);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = "#ef4444";
+    ctx.font = 'bold 9px "JetBrains Mono", monospace';
+    ctx.textAlign = "center";
+    ctx.fillText("Nodo Internuclear (Ψ = 0)", midX, midY + 105);
+
+    // Signos de fase cuántica
+    ctx.font = 'bold 16px "JetBrains Mono", monospace';
+    ctx.fillStyle = "#38bdf8";
+    ctx.fillText("(+)", nucA_X - 35, midY - 35);
+    ctx.fillStyle = "#f43f5e";
+    ctx.fillText("(-)", nucB_X + 35, midY - 35);
+  }
+
+  // 3. Dibujar Núcleos Atómicos A y B
+  const nucleiData = [
+    { x: nucA_X, name: mol.atomA.split(" ")[0], label: mol.atomA.split(" ")[0] },
+    { x: nucB_X, name: mol.atomB.split(" ")[0], label: mol.atomB.split(" ")[0] }
+  ];
+
+  nucleiData.forEach((nuc, idx) => {
+    // Brillo nuclear
+    ctx.shadowColor = mol.theme.primary;
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(nuc.x, midY, 7.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.strokeStyle = mol.theme.primary;
+    ctx.lineWidth = 2.2;
+    ctx.stroke();
+
+    // Etiqueta del átomo
+    ctx.fillStyle = "#f8fafc";
+    ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+    ctx.textAlign = "center";
+    ctx.fillText(nuc.label, nuc.x, midY + 22);
+
+    // Indicador de carga parcial en moléculas polares
+    if (mol.category === "polar-extreme" || mol.category === "polar-coordinative") {
+      ctx.fillStyle = idx === 0 ? "#38bdf8" : "#ec4899";
+      ctx.font = 'bold 10px "JetBrains Mono", monospace';
+      ctx.fillText(idx === 0 ? "δ+" : "δ-", nuc.x, midY - 14);
+    }
+  });
+
+  // 4. HUD Telemetría Cuántica en esquinas del Canvas
+  // Superior Izquierda: Molécula e Identidad
+  ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
+  ctx.strokeStyle = "rgba(56, 189, 248, 0.25)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.roundRect(14, 14, 150, 48, 6);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = mol.theme.primary;
+  ctx.font = 'bold 12px "JetBrains Mono", monospace';
+  ctx.textAlign = "left";
+  ctx.fillText(mol.formula + " • " + mol.name, 22, 32);
+
+  ctx.fillStyle = "#94a3b8";
+  ctx.font = '10px "Plus Jakarta Sans", sans-serif';
+  ctx.fillText("OM: " + lvl.name + " (" + lvl.occ + " e⁻)", 22, 48);
+
+  // Inferior Izquierda: Métricas físicas en vivo
+  ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
+  ctx.strokeStyle = "rgba(148, 163, 184, 0.2)";
+  ctx.beginPath();
+  ctx.roundRect(14, h - 56, 175, 42, 6);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = "#38bdf8";
+  ctx.font = 'bold 10px "JetBrains Mono", monospace';
+  ctx.fillText("BO: " + mol.bo.toFixed(1) + " | " + mol.mag.split(" ")[0], 22, h - 38);
+
+  ctx.fillStyle = "#94a3b8";
+  ctx.font = '9px "JetBrains Mono", monospace';
+  ctx.fillText("Vib: " + (mol.freqVib ? mol.freqVib.split(" ")[0] : "N/A"), 22, h - 22);
+
+  // Destello de transición cuántica suave
+  if (moTransitionProgress < 1.0) {
+    const flashAlpha = (1.0 - moTransitionProgress) * 0.45;
+    ctx.fillStyle = `rgba(56, 189, 248, ${flashAlpha})`;
+    ctx.fillRect(0, 0, w, h);
+  }
+}
+
+// Inicialización de la pestaña cuántica
+function initQuantumTab() {
+  renderMOMoleculeButtons();
+  selectMOMolecule(currentMOMol ? currentMOMol.id : "H2");
+  initAuditorModule();
+  startMOAnimationLoop();
+}
+
+// SUBMÓDULO 2: AUDITOR CUÁNTICO (AUFBAU, PAULI, HUND)
+// -------------------------------------------------------------------------
+
+const AUDITOR_ELEMENTS = [
+  { sym: "H", name: "Hidrógeno", z: 1, basal: [1, 0,0,0, 0, 0,0,0, 0, 0,0,0,0,0] },
+  { sym: "He", name: "Helio", z: 2, basal: [2, 0,0,0, 0, 0,0,0, 0, 0,0,0,0,0] },
+  { sym: "C", name: "Carbono", z: 6, basal: [2, 2, 1,1,0, 0, 0,0,0, 0, 0,0,0,0,0] },
+  { sym: "N", name: "Nitrógeno", z: 7, basal: [2, 2, 1,1,1, 0, 0,0,0, 0, 0,0,0,0,0] },
+  { sym: "O", name: "Oxígeno", z: 8, basal: [2, 2, 2,1,1, 0, 0,0,0, 0, 0,0,0,0,0] },
+  { sym: "Ne", name: "Neón", z: 10, basal: [2, 2, 2,2,2, 0, 0,0,0, 0, 0,0,0,0,0] },
+  { sym: "Na", name: "Sodio", z: 11, basal: [2, 2, 2,2,2, 1, 0,0,0, 0, 0,0,0,0,0] },
+  { sym: "P", name: "Fósforo", z: 15, basal: [2, 2, 2,2,2, 2, 1,1,1, 0, 0,0,0,0,0] },
+  { sym: "Cl", name: "Cloro", z: 17, basal: [2, 2, 2,2,2, 2, 2,2,1, 0, 0,0,0,0,0] },
+  { sym: "Ar", name: "Argón", z: 18, basal: [2, 2, 2,2,2, 2, 2,2,2, 0, 0,0,0,0,0] },
+  { sym: "K", name: "Potasio", z: 19, basal: [2, 2, 2,2,2, 2, 2,2,2, 1, 0,0,0,0,0] },
+  { sym: "Cr", name: "Cromo (Anomalía 4s¹ 3d⁵)", z: 24, basal: [2, 2, 2,2,2, 2, 2,2,2, 1, 1,1,1,1,1] },
+  { sym: "Fe", name: "Hierro", z: 26, basal: [2, 2, 2,2,2, 2, 2,2,2, 2, 2,1,1,1,1] },
+  { sym: "Cu", name: "Cobre (Anomalía 4s¹ 3d¹⁰)", z: 29, basal: [2, 2, 2,2,2, 2, 2,2,2, 1, 2,2,2,2,2] }
+];
+
+// Metadatos de cada una de las 14 cajas orbitales
+const ORBITAL_BOX_DEFS = [
+  { id: 0, subshell: "1s", n: 1, l: 0, ml: 0, max: 2 },
+  { id: 1, subshell: "2s", n: 2, l: 0, ml: 0, max: 2 },
+  { id: 2, subshell: "2p", n: 2, l: 1, ml: -1, max: 2, pGroup: 0 },
+  { id: 3, subshell: "2p", n: 2, l: 1, ml: 0, max: 2, pGroup: 0 },
+  { id: 4, subshell: "2p", n: 2, l: 1, ml: 1, max: 2, pGroup: 0 },
+  { id: 5, subshell: "3s", n: 3, l: 0, ml: 0, max: 2 },
+  { id: 6, subshell: "3p", n: 3, l: 1, ml: -1, max: 2, pGroup: 1 },
+  { id: 7, subshell: "3p", n: 3, l: 1, ml: 0, max: 2, pGroup: 1 },
+  { id: 8, subshell: "3p", n: 3, l: 1, ml: 1, max: 2, pGroup: 1 },
+  { id: 9, subshell: "4s", n: 4, l: 0, ml: 0, max: 2 },
+  { id: 10, subshell: "3d", n: 3, l: 2, ml: -2, max: 2, dGroup: 0 },
+  { id: 11, subshell: "3d", n: 3, l: 2, ml: -1, max: 2, dGroup: 0 },
+  { id: 12, subshell: "3d", n: 3, l: 2, ml: 0, max: 2, dGroup: 0 },
+  { id: 13, subshell: "3d", n: 3, l: 2, ml: 1, max: 2, dGroup: 0 },
+  { id: 14, subshell: "3d", n: 3, l: 2, ml: 2, max: 2, dGroup: 0 }
+];
+
+let currentAuditorElement = AUDITOR_ELEMENTS[2]; // Carbono por defecto
+let userOrbitalState = new Array(15).fill(0);
+
+function initAuditorModule() {
+  renderAuditorChips();
+  renderOrbitalBoxes();
+  selectAuditorElement("C");
+}
+
+function renderAuditorChips() {
+  const container = document.getElementById("auditorChips");
+  if (!container) return;
+  container.innerHTML = AUDITOR_ELEMENTS.map(el => `
+    <button class="auditor-chip ${el.sym === currentAuditorElement.sym ? 'active' : ''}" onclick="selectAuditorElement('${el.sym}')">
+      ${el.sym} (Z=${el.z})
+    </button>
+  `).join("");
+}
+
+function selectAuditorElement(sym) {
+  const found = AUDITOR_ELEMENTS.find(e => e.sym === sym);
+  if (!found) return;
+  currentAuditorElement = found;
+
+  document.querySelectorAll(".auditor-chip").forEach(c => {
+    c.classList.toggle("active", c.textContent.trim().startsWith(sym + " "));
+  });
+
+  autoFillBasalConfig();
+}
+
+function renderOrbitalBoxes() {
+  const subshellMap = {
+    "1s": "subshell-1s",
+    "2s": "subshell-2s",
+    "2p": "subshell-2p",
+    "3s": "subshell-3s",
+    "3p": "subshell-3p",
+    "4s": "subshell-4s",
+    "3d": "subshell-3d"
+  };
+
+  // Limpiar contenedores
+  Object.values(subshellMap).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = "";
+  });
+
+  ORBITAL_BOX_DEFS.forEach((boxDef) => {
+    const contId = subshellMap[boxDef.subshell];
+    const container = document.getElementById(contId);
+    if (!container) return;
+
+    const box = document.createElement("div");
+    box.className = "orbital-box";
+    box.id = "orb-box-" + boxDef.id;
+    box.onclick = () => toggleOrbitalElectron(boxDef.id);
+
+    const spinsSpan = document.createElement("span");
+    spinsSpan.className = "orbital-box-spins";
+    spinsSpan.id = "orb-spins-" + boxDef.id;
+
+    const mlSpan = document.createElement("span");
+    mlSpan.className = "orbital-box-ml";
+    mlSpan.textContent = "ml=" + (boxDef.ml > 0 ? "+" + boxDef.ml : boxDef.ml);
+
+    box.appendChild(spinsSpan);
+    box.appendChild(mlSpan);
+    container.appendChild(box);
+  });
+}
+
+function toggleOrbitalElectron(boxId) {
+  const current = userOrbitalState[boxId];
+  // Ciclo: 0 -> 1 (↑) -> 2 (↑↓) -> 0
+  userOrbitalState[boxId] = (current + 1) % 3;
+  updateOrbitalUI();
+  auditQuantumConfiguration();
+  playSparkSound();
+}
+
+function autoFillBasalConfig() {
+  userOrbitalState = [...currentAuditorElement.basal];
+  updateOrbitalUI();
+  auditQuantumConfiguration();
+}
+
+function clearAuditorOrbitals() {
+  userOrbitalState.fill(0);
+  updateOrbitalUI();
+  auditQuantumConfiguration();
+}
+
+function randomAuditorChallenge() {
+  const rand = AUDITOR_ELEMENTS[Math.floor(Math.random() * AUDITOR_ELEMENTS.length)];
+  selectAuditorElement(rand.sym);
+  clearAuditorOrbitals();
+}
+
+function updateOrbitalUI() {
+  ORBITAL_BOX_DEFS.forEach((boxDef) => {
+    const boxEl = document.getElementById("orb-box-" + boxDef.id);
+    const spinsEl = document.getElementById("orb-spins-" + boxDef.id);
+    if (!boxEl || !spinsEl) return;
+
+    const count = userOrbitalState[boxDef.id];
+    boxEl.classList.remove("occupied-1", "occupied-2");
+
+    if (count === 1) {
+      boxEl.classList.add("occupied-1");
+      spinsEl.innerHTML = '<span class="spin-up">↑</span>';
+    } else if (count === 2) {
+      boxEl.classList.add("occupied-2");
+      spinsEl.innerHTML = '<span class="spin-up">↑</span><span class="spin-down">↓</span>';
+    } else {
+      spinsEl.innerHTML = "";
+    }
+  });
+
+  // Actualizar contador de electrones
+  const totalAssigned = userOrbitalState.reduce((a, b) => a + b, 0);
+  const counterEl = document.getElementById("auditorElectronCounter");
+  if (counterEl) {
+    counterEl.textContent = `e⁻ Asignados: ${totalAssigned} / ${currentAuditorElement.z}`;
+    counterEl.style.borderColor = totalAssigned === currentAuditorElement.z ? "rgba(52, 211, 153, 0.4)" : "rgba(56, 189, 248, 0.3)";
+  }
+}
+
+// MOTOR DE AUDITORÍA CUÁNTICA EN TIEMPO REAL
+function auditQuantumConfiguration() {
+  const zTarget = currentAuditorElement.z;
+  const totalElectrons = userOrbitalState.reduce((a, b) => a + b, 0);
+
+  let status = "basal"; // 'basal', 'excited', 'violation_hund', 'violation_pauli'
+  let verdict = "";
+  let lastOccupiedBox = null;
+
+  // 1. Detección de Violación de la Regla de Hund en subniveles degenerados (2p, 3p, 3d)
+  const degenerateGroups = [
+    { name: "2p", boxes: [2, 3, 4] },
+    { name: "3p", boxes: [6, 7, 8] },
+    { name: "3d", boxes: [10, 11, 12, 13, 14] }
+  ];
+
+  let hundViolation = false;
+  degenerateGroups.forEach(g => {
+    const counts = g.boxes.map(id => userOrbitalState[id]);
+    const hasPaired = counts.some(c => c === 2);
+    const hasEmpty = counts.some(c => c === 0);
+    if (hasPaired && hasEmpty) {
+      hundViolation = true;
+    }
+  });
+
+  // 2. Detección del Principio de Aufbau (Llenado progresivo de menor a mayor energía)
+  // Orden energético: 1s(0) < 2s(1) < 2p(2,3,4) < 3s(5) < 3p(6,7,8) < 4s(9) < 3d(10..14)
+  let aufbauViolation = false;
+  let highestOccupied = -1;
+  for (let i = userOrbitalState.length - 1; i >= 0; i--) {
+    if (userOrbitalState[i] > 0) {
+      highestOccupied = i;
+      break;
+    }
+  }
+
+  // Verificar si hay huecos en niveles anteriores (excluyendo anomalías de Cr y Cu)
+  const isCrAnomaly = currentAuditorElement.sym === "Cr" && totalElectrons === 24 && userOrbitalState[9] === 1 && userOrbitalState.slice(10, 15).every(c => c === 1);
+  const isCuAnomaly = currentAuditorElement.sym === "Cu" && totalElectrons === 29 && userOrbitalState[9] === 1 && userOrbitalState.slice(10, 15).every(c => c === 2);
+
+  if (!isCrAnomaly && !isCuAnomaly && highestOccupied > 0) {
+    for (let i = 0; i < highestOccupied; i++) {
+      const def = ORBITAL_BOX_DEFS[i];
+      // Si un nivel anterior no está completamente lleno (2 electrones) y un nivel posterior tiene electrones
+      if (userOrbitalState[i] < 2) {
+        aufbauViolation = true;
+        break;
+      }
+    }
+  }
+
+  // Determinar último electrón diferenciante
+  if (highestOccupied !== -1) {
+    lastOccupiedBox = ORBITAL_BOX_DEFS[highestOccupied];
+  }
+
+  // Evaluar veredicto
+  const badge = document.getElementById("auditorStatusBadge");
+  const verdictEl = document.getElementById("auditorVerdictText");
+
+  if (hundViolation) {
+    status = "violation_hund";
+    if (badge) {
+      badge.className = "auditor-status-badge status-violation";
+      badge.innerHTML = "<span>⚠️</span> VIOLACIÓN DE LA REGLA DE HUND";
+    }
+    if (verdictEl) {
+      verdictEl.textContent = "Se ha producido apareamiento prematuro de electrones sin antes haber semillenado todos los orbitales degenerados del subnivel con espines paralelos. Esto aumenta innecesariamente la repulsión culombiana internuclear.";
+    }
+  } else if (aufbauViolation) {
+    status = "excited";
+    if (badge) {
+      badge.className = "auditor-status-badge status-excited";
+      badge.innerHTML = "<span>⚡</span> ESTADO EXCITADO (Violación de Aufbau)";
+    }
+    if (verdictEl) {
+      verdictEl.textContent = "Los electrones ocupan niveles de mayor energía dejando orbitales basales más internos vacíos o incompletos. Esta configuración es energéticamente inestable y decae espontáneamente emitiendo un fotón.";
+    }
+  } else if (totalElectrons === zTarget) {
+    status = "basal";
+    if (badge) {
+      badge.className = "auditor-status-badge status-basal";
+      badge.innerHTML = "<span>✅</span> ESTADO BASAL VÁLIDO (Leyes Satisfechas)";
+    }
+    if (verdictEl) {
+      verdictEl.textContent = `Excelente: La distribución cuántica cumple rigurosamente el Principio de Aufbau, el Principio de Exclusión de Pauli y la Regla de Hund de máxima multiplicidad para el ${currentAuditorElement.name}.`;
+    }
+  } else {
+    status = "partial";
+    if (badge) {
+      badge.className = "auditor-status-badge status-excited";
+      badge.innerHTML = `<span>ℹ️</span> CONFIGURACIÓN INCOMPLETA (${totalElectrons} / ${zTarget} e⁻)`;
+    }
+    if (verdictEl) {
+      verdictEl.textContent = `Faltan ${zTarget - totalElectrons} electrones por asignar para completar el átomo neutro de ${currentAuditorElement.name}.`;
+    }
+  }
+
+  // Actualizar notaciones
+  updateSpectroscopicNotation();
+
+  // Actualizar los 4 números cuánticos del electrón diferenciante
+  updateQuantumNumbers(lastOccupiedBox);
+}
+
+function updateSpectroscopicNotation() {
+  const parts = [];
+  const groups = [
+    { label: "1s", boxes: [0] },
+    { label: "2s", boxes: [1] },
+    { label: "2p", boxes: [2, 3, 4] },
+    { label: "3s", boxes: [5] },
+    { label: "3p", boxes: [6, 7, 8] },
+    { label: "4s", boxes: [9] },
+    { label: "3d", boxes: [10, 11, 12, 13, 14] }
+  ];
+
+  groups.forEach(g => {
+    const sum = g.boxes.reduce((acc, id) => acc + userOrbitalState[id], 0);
+    if (sum > 0) {
+      parts.push(`${g.label}${getSuperscript(sum)}`);
+    }
+  });
+
+  const notationEl = document.getElementById("auditorSpectroscopicNotation");
+  if (notationEl) {
+    notationEl.textContent = parts.join(" ") || "Sin electrones";
+  }
+
+  const gasNobleEl = document.getElementById("auditorGasNobleNotation");
+  if (gasNobleEl) {
+    const total = userOrbitalState.reduce((a, b) => a + b, 0);
+    if (total >= 18) {
+      gasNobleEl.textContent = "[Ar] " + parts.slice(5).join(" ");
+    } else if (total >= 10) {
+      gasNobleEl.textContent = "[Ne] " + parts.slice(3).join(" ");
+    } else if (total >= 2) {
+      gasNobleEl.textContent = "[He] " + parts.slice(1).join(" ");
+    } else {
+      gasNobleEl.textContent = parts.join(" ");
+    }
+  }
+}
+
+function getSuperscript(num) {
+  const map = { 0: "⁰", 1: "¹", 2: "²", 3: "³", 4: "⁴", 5: "⁵", 6: "⁶", 7: "⁷", 8: "⁸", 9: "⁹", 10: "¹⁰" };
+  return String(num).split("").map(c => map[c] || c).join("");
+}
+
+function updateQuantumNumbers(boxDef) {
+  const nEl = document.getElementById("qn-n");
+  const lEl = document.getElementById("qn-l");
+  const mlEl = document.getElementById("qn-ml");
+  const msEl = document.getElementById("qn-ms");
+
+  if (!boxDef) {
+    if (nEl) nEl.textContent = "-";
+    if (lEl) lEl.textContent = "-";
+    if (mlEl) mlEl.textContent = "-";
+    if (msEl) msEl.textContent = "-";
+    return;
+  }
+
+  const lNames = { 0: "0 (s)", 1: "1 (p)", 2: "2 (d)" };
+  const count = userOrbitalState[boxDef.id];
+
+  if (nEl) nEl.textContent = boxDef.n;
+  if (lEl) lEl.textContent = lNames[boxDef.l] || boxDef.l;
+  if (mlEl) mlEl.textContent = boxDef.ml > 0 ? "+" + boxDef.ml : boxDef.ml;
+  if (msEl) msEl.textContent = count === 2 ? "-½" : "+½";
 }
 
 // 8. HERRAMIENTAS: CALCULADORA DE MASA MOLAR & BALANCEADOR
@@ -5224,6 +7155,86 @@ function nextQuizQuestion() {
   renderQuizQuestion();
 }
 
+// =========================================================================
+// GESTOR DE VISIBILIDAD POR INTERSECTION OBSERVER Y PAGE VISIBILITY API
+// =========================================================================
+function initVisibilityObservers() {
+  if (typeof IntersectionObserver === 'undefined') {
+    isWorkbenchInViewport = true;
+    isMOContourInViewport = true;
+    wakeWorkbenchLoop();
+    wakeMOLoop();
+    return;
+  }
+
+  // 1. Observador para el Canvas del Constructor Molecular (workbenchCanvas)
+  const wbCanvas = document.getElementById("workbenchCanvas");
+  if (wbCanvas) {
+    const wbObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const wasVisible = isWorkbenchInViewport;
+        isWorkbenchInViewport = entry.isIntersecting && entry.intersectionRatio > 0.02;
+        if (isWorkbenchInViewport && !wasVisible) {
+          wakeWorkbenchLoop();
+        } else if (!isWorkbenchInViewport && workbenchAnimId) {
+          cancelAnimationFrame(workbenchAnimId);
+          workbenchAnimId = null;
+        }
+      });
+    }, { threshold: [0, 0.05, 0.2] });
+    wbObserver.observe(wbCanvas);
+  }
+
+  // 2. Observador para el Canvas de Densidad de Probabilidad MO (moContourCanvas)
+  const moCanvas = document.getElementById("moContourCanvas");
+  if (moCanvas) {
+    const moObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const wasVisible = isMOContourInViewport;
+        isMOContourInViewport = entry.isIntersecting && entry.intersectionRatio > 0.02;
+        if (isMOContourInViewport && !wasVisible) {
+          wakeMOLoop();
+        } else if (!isMOContourInViewport && moContourAnimId) {
+          cancelAnimationFrame(moContourAnimId);
+          moContourAnimId = null;
+        }
+      });
+    }, { threshold: [0, 0.05, 0.2] });
+    moObserver.observe(moCanvas);
+  }
+
+  // 3. Listener para Page Visibility API (cambio de pestaña o minimizar navegador)
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      if (workbenchAnimId) {
+        cancelAnimationFrame(workbenchAnimId);
+        workbenchAnimId = null;
+      }
+      if (moContourAnimId) {
+        cancelAnimationFrame(moContourAnimId);
+        moContourAnimId = null;
+      }
+      if (atomAnimFrameId) {
+        cancelAnimationFrame(atomAnimFrameId);
+        atomAnimFrameId = null;
+      }
+    } else {
+      wakeWorkbenchLoop();
+      wakeMOLoop();
+      const modal = document.getElementById('quantumModal');
+      if (modal && modal.classList.contains('active')) {
+        startAtomSimulation();
+      }
+    }
+  });
+
+  // 4. Listener para reanudación al ganar foco
+  window.addEventListener("focus", () => {
+    wakeWorkbenchLoop();
+    wakeMOLoop();
+  });
+}
+
 // INICIALIZACIÓN GLOBAL
 window.addEventListener('DOMContentLoaded', () => {
   renderLegend();
@@ -5232,27 +7243,31 @@ window.addEventListener('DOMContentLoaded', () => {
   initWorkbenchEvents();
   resizeWorkbenchCanvas();
   startWorkbenchLoop();
-  initLabCanvas();
-  startLabCanvasLoop();
+  initQuantumTab();
+  initVisibilityObservers();
   calculateMolarMass();
   balanceEquation();
   renderQuizQuestion();
 
   window.addEventListener('resize', () => {
     resizeWorkbenchCanvas();
-    initLabCanvas();
+    renderMODiagram();
+    renderMOContour();
   });
 
   // Observador de Redimensión en Contenedores para estabilidad gráfica total
   if (window.ResizeObserver) {
     const ro = new ResizeObserver(() => {
       resizeWorkbenchCanvas();
-      initLabCanvas();
+      renderMODiagram();
+      renderMOContour();
     });
     const wb = document.getElementById('builderWorkbenchContainer');
-    const ls = document.querySelector('.lab-stage');
+    const moE = document.getElementById('moEnergyContainer');
+    const moC = document.getElementById('moContourContainer');
     if (wb) ro.observe(wb);
-    if (ls) ro.observe(ls);
+    if (moE) ro.observe(moE);
+    if (moC) ro.observe(moC);
   }
 
   // Molécula inicial: H2O

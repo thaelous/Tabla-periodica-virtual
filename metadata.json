@@ -1,6 +1,6 @@
 {
   "name": "Tabla Periódica Interactiva",
-  "description": "Tabla periódica interactiva con inspector cuántico de orbitales, calculadora de masa molar, balanceador de ecuaciones, laboratorio virtual y constructor de moléculas.",
+  "description": "Tabla periódica interactiva por Robert Pacheco con constructor de moléculas 3D, autómata cuántico de diagramas MO, auditor cuántico de Aufbau/Pauli/Hund, herramientas y quiz.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
